@@ -408,7 +408,8 @@ export const initInitialData = async (db: DatabaseAdapter): Promise<void> => {
         ['CAD', 'CA$', 'Canadian Dollar', '{symbol}{amount}', '100'],
         ['CHF', 'CHF', 'Swiss Franc', '{symbol} {amount}', '100'],
         ['CNY', '¥', 'Chinese Yuan', '{symbol}{amount}', '100'],
-        ['INR', '₹', 'Indian Rupee', '{symbol}{amount}', '100']
+        ['INR', '₹', 'Indian Rupee', '{symbol}{amount}', '100'],
+        ['THB', '฿', 'Thai Baht', '{symbol}{amount}', '100']
       ],
       db.type,
       'code'

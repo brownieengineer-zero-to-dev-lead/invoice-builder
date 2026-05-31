@@ -7,7 +7,8 @@ export const LANGUAGE_ITEMS = {
   [Language.lt]: { label: 'Lithuanian', value: Language.lt },
   [Language.en]: { label: 'English', value: Language.en },
   [Language.fr]: { label: 'French', value: Language.fr },
-  [Language.de]: { label: 'German', value: Language.de }
+  [Language.de]: { label: 'German', value: Language.de },
+  [Language.th]: { label: 'ไทย', value: Language.th }
 } as const;
 
 export const LANGUAGE_ITEMS_ARRAY = Object.values(LANGUAGE_ITEMS);
@@ -83,5 +84,6 @@ export const FONT_ITEMS_ARRAY = [
   { label: 'Times-Roman', value: 'Times-Roman' },
   { label: 'Courier', value: 'Courier' },
   { label: 'Roboto', value: 'Roboto' },
-  { label: 'Inter', value: 'Inter' }
+  { label: 'Inter', value: 'Inter' },
+  { label: 'Sarabun (Thai)', value: 'Sarabun' }
 ];

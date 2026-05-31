@@ -42,7 +42,8 @@ export const FONT_WIDTH_MULTIPLIERS: Record<string, number> = {
   Roboto: 6,
   'Times-Roman': 7,
   Courier: 10,
-  Inter: 6
+  Inter: 6,
+  Sarabun: 6
 };
 
 export const FONT_SIZES = {

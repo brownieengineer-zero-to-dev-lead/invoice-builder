@@ -36,6 +36,14 @@ import RobotoMediumItalic from './../../../assets/roboto/Roboto-MediumItalic.ttf
 import RobotoRegular from './../../../assets/roboto/Roboto-Regular.ttf';
 import RobotoSemiBold from './../../../assets/roboto/Roboto-SemiBold.ttf';
 import RobotoSemiBoldItalic from './../../../assets/roboto/Roboto-SemiBoldItalic.ttf';
+import SarabunBold from './../../../assets/sarabun/Sarabun-Bold.ttf';
+import SarabunBoldItalic from './../../../assets/sarabun/Sarabun-BoldItalic.ttf';
+import SarabunItalic from './../../../assets/sarabun/Sarabun-Italic.ttf';
+import SarabunMedium from './../../../assets/sarabun/Sarabun-Medium.ttf';
+import SarabunMediumItalic from './../../../assets/sarabun/Sarabun-MediumItalic.ttf';
+import SarabunRegular from './../../../assets/sarabun/Sarabun-Regular.ttf';
+import SarabunSemiBold from './../../../assets/sarabun/Sarabun-SemiBold.ttf';
+import SarabunSemiBoldItalic from './../../../assets/sarabun/Sarabun-SemiBoldItalic.ttf';
 import { createCustomFontStyles, DEFAULT_FONT_SIZES, FONT_SIZES, PDF_STYLES } from './constant';
 import { FinancialInfo } from './FinancialInfo';
 import { HeaderInfo } from './HeaderInfo';
@@ -98,6 +106,14 @@ const registerFonts = () => {
   Font.register({ family: 'Inter', src: Inter_28pt_SemiBoldItalic, fontWeight: 600, fontStyle: 'italic' });
   Font.register({ family: 'Inter', src: Inter_28pt_Bold, fontWeight: 700 });
   Font.register({ family: 'Inter', src: Inter_28pt_BoldItalic, fontWeight: 700, fontStyle: 'italic' });
+  Font.register({ family: 'Sarabun', src: SarabunRegular, fontWeight: 400 });
+  Font.register({ family: 'Sarabun', src: SarabunItalic, fontWeight: 400, fontStyle: 'italic' });
+  Font.register({ family: 'Sarabun', src: SarabunMedium, fontWeight: 500 });
+  Font.register({ family: 'Sarabun', src: SarabunMediumItalic, fontWeight: 500, fontStyle: 'italic' });
+  Font.register({ family: 'Sarabun', src: SarabunSemiBold, fontWeight: 600 });
+  Font.register({ family: 'Sarabun', src: SarabunSemiBoldItalic, fontWeight: 600, fontStyle: 'italic' });
+  Font.register({ family: 'Sarabun', src: SarabunBold, fontWeight: 700 });
+  Font.register({ family: 'Sarabun', src: SarabunBoldItalic, fontWeight: 700, fontStyle: 'italic' });
 };
 
 registerFonts();

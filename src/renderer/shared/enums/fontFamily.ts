@@ -3,5 +3,6 @@ export enum FontFamily {
   timesRoman = 'Times-Roman',
   courier = 'Courier',
   roboto = 'Roboto',
-  inter = 'Inter'
+  inter = 'Inter',
+  sarabun = 'Sarabun'
 }

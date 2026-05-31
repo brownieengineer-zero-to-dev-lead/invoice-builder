@@ -351,7 +351,8 @@ export const isStyleProfileFromData = (data: unknown): data is StyleProfileFromD
       d.fontFamily === 'Times-Roman' ||
       d.fontFamily === 'Courier' ||
       d.fontFamily === 'Roboto' ||
-      d.fontFamily === 'Inter'
+      d.fontFamily === 'Inter' ||
+      d.fontFamily === 'Sarabun'
     )
   )
     return false;
