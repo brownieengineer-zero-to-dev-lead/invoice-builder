@@ -5,7 +5,7 @@ import type { ColumnWeights } from '../../../shared/types/columnsWeights';
 export const createCustomFontStyles = (fontFamily?: string) =>
   StyleSheet.create({
     customFont: {
-      fontFamily: fontFamily || 'Roboto'
+      fontFamily: fontFamily || 'Sarabun'
     }
   });
 
