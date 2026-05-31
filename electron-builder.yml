@@ -6,7 +6,7 @@ directories:
 
 publish:
   provider: github
-  owner: piratuks
+  owner: brownieengineer-zero-to-dev-lead
   repo: invoice-builder
 
 files:
