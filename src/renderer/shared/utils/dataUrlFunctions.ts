@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 export const toDataUrl = (input: Blob | Uint8Array, mimeType: string = 'image/png'): Promise<string> => {
   mimeType = mimeType ?? 'image/png';
 
-  const blob = input instanceof Blob ? input : new Blob([new Uint8Array(input).buffer], { type: mimeType });
+  const blob = input instanceof Blob ? input : new Blob([input instanceof Uint8Array ? input : new Uint8Array(input)], { type: mimeType });
 
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
