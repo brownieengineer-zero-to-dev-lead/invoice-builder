@@ -651,5 +651,23 @@
       "noInvoicesText": "Units who do not have invoices"
     },
     "noItem": "Selected a unit to view details."
+  },
+  "employees": {
+    "filter": {
+      "allText": "All employees",
+      "activeText": "Active employees",
+      "archivedText": "Archived employees",
+      "activeDesc": "Employees that are not archived",
+      "archivedDesc": "Employees that have been archived"
+    }
+  },
+  "contractors": {
+    "filter": {
+      "allText": "All contractors",
+      "activeText": "Active contractors",
+      "archivedText": "Archived contractors",
+      "activeDesc": "Contractors that are not archived",
+      "archivedDesc": "Contractors that have been archived"
+    }
   }
 }

@@ -1,4 +1,5 @@
 export enum InvoiceFormMode {
   edit = 'edit',
-  preview = 'preview'
+  preview = 'preview',
+  previewCopy34 = 'previewCopy34'
 }

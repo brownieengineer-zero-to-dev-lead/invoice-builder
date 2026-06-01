@@ -11,7 +11,8 @@ const loadSarabunFont = async (): Promise<Uint8Array> => {
 
 export const fillPdfForm = async (
   templateUrl: string,
-  fieldValues: PdfFieldValues
+  fieldValues: PdfFieldValues,
+  fontSizes?: Record<string, number>
 ): Promise<Uint8Array> => {
   const [existingPdfBytes, fontBytes, fontkitModule] = await Promise.all([
     fetch(templateUrl).then(r => r.arrayBuffer()),
@@ -37,6 +38,7 @@ export const fillPdfForm = async (
       } else {
         const field = form.getTextField(name);
         field.setText(String(value));
+        if (fontSizes?.[name] !== undefined) field.setFontSize(fontSizes[name]);
         field.updateAppearances(font);
       }
     } catch {

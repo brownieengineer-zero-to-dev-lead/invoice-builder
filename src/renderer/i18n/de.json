@@ -651,5 +651,23 @@
       "noInvoicesText": "Einheiten ohne Rechnungen"
     },
     "noItem": "Einheit auswählen, um Details anzuzeigen."
+  },
+  "employees": {
+    "filter": {
+      "allText": "Alle Mitarbeiter",
+      "activeText": "Aktive Mitarbeiter",
+      "archivedText": "Archivierte Mitarbeiter",
+      "activeDesc": "Mitarbeiter, die nicht archiviert sind",
+      "archivedDesc": "Mitarbeiter, die archiviert wurden"
+    }
+  },
+  "contractors": {
+    "filter": {
+      "allText": "Alle Auftragnehmer",
+      "activeText": "Aktive Auftragnehmer",
+      "archivedText": "Archivierte Auftragnehmer",
+      "activeDesc": "Auftragnehmer, die nicht archiviert sind",
+      "archivedDesc": "Auftragnehmer, die archiviert wurden"
+    }
   }
 }

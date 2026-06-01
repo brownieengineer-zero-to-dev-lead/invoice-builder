@@ -26,7 +26,12 @@ const buildAddress = (entity: {
   return parts.join(' ');
 };
 
-const formatAmount = (v: number) => (v / 100).toFixed(2);
+const formatAmount = (v: number) => new Intl.NumberFormat('en-US', {
+  style: 'decimal',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+}).format(v);
+
 
 const deliveryMethodCheckField = (method: string): Record<string, boolean> => ({
   chk8: method === 'หัก ณ ที่จ่าย',
@@ -35,11 +40,11 @@ const deliveryMethodCheckField = (method: string): Record<string, boolean> => ({
   chk11: false
 });
 
-export const exportTawi50Employee = async (
+export const buildTawi50Bytes = async (
   record: Tawi50EmployeeRecord,
   employee: Employee,
   business: Business
-) => {
+): Promise<Uint8Array> => {
   const issuedDate = record.issuedDate ? new Date(record.issuedDate) : new Date();
   const day = issuedDate.getDate().toString();
   const month = (issuedDate.getMonth() + 1).toString();
@@ -49,12 +54,12 @@ export const exportTawi50Employee = async (
     book_no: record.bookNo ?? '',
     run_no: record.runNo ?? '',
     name1: business.name,
-    tin1: business.code ?? '',
+    id1: formatIdCard(business.code ?? ''),
     add1: (business as Record<string, unknown>).addressNo
       ? buildAddress(business as Parameters<typeof buildAddress>[0])
       : business.address ?? '',
     name2: employee.name,
-    tin1_2: employee.taxId,
+    id1_2: formatIdCard(employee.taxId),
     add2: buildAddress(employee),
     chk1: true,
     ...deliveryMethodCheckField(record.deliveryMethod),
@@ -77,9 +82,25 @@ export const exportTawi50Employee = async (
     '../../assets/template-documents/tawi-50-employee.pdf',
     import.meta.url
   ).href;
-  const bytes = await fillPdfForm(templateUrl, fields);
+  return fillPdfForm(templateUrl, fields);
+};
+
+export const exportTawi50Employee = async (
+  record: Tawi50EmployeeRecord,
+  employee: Employee,
+  business: Business
+) => {
+  const bytes = await buildTawi50Bytes(record, employee, business);
   downloadPdf(bytes, `tawi50-employee-${employee.name}-${record.taxYear}.pdf`);
 };
+
+const formatIdCard = (id: string): string => {
+    const cleaned = id.replace(/\D/g, '');
+    if (cleaned.length !== 13) {
+        return id;
+    }
+    return cleaned.replace(/^(\d{1})(\d{4})(\d{5})(\d{2})(\d{1})$/, '$1 $2 $3 $4 $5');
+}
 
 const buildContractorFields = (
   transaction: WhtTransaction,
@@ -105,12 +126,12 @@ const buildContractorFields = (
     book_no: transaction.bookNo ?? '',
     run_no: transaction.runNo ?? '',
     name1: business.name,
-    tin1: business.code ?? '',
+    id1: formatIdCard(business.code ?? ''),
     add1: (business as Record<string, unknown>).addressNo
       ? buildAddress(business as Parameters<typeof buildAddress>[0])
       : business.address ?? '',
     name2: contractor.name,
-    tin1_2: contractor.taxId,
+    id1_2: formatIdCard(contractor.taxId),
     add2: buildAddress(contractor),
     ...incomeTypeRow,
     date1: `${payDate.getDate()}/${payDate.getMonth() + 1}/${payDate.getFullYear() + 543}`,
@@ -130,18 +151,47 @@ const getContractorTemplateUrl = (copy: 1 | 2 | 3 | 4) =>
     import.meta.url
   ).href;
 
+export const buildWhtTransactionBytes12 = async (
+  transaction: WhtTransaction,
+  contractor: Contractor,
+  business: Business
+): Promise<Uint8Array> => {
+  const fields = buildContractorFields(transaction, contractor, business);
+  const fontSizes = {
+    'id1': 8,
+    'name2': 9,
+    'id1_2': 8,
+    'date1': 11,
+    'pay1.0': 11,
+    'tax1.0': 11
+  };
+  const [bytes1, bytes2] = await Promise.all([
+    fillPdfForm(getContractorTemplateUrl(1), fields, fontSizes),
+    fillPdfForm(getContractorTemplateUrl(2), fields, fontSizes)
+  ]);
+  return mergePdfs([bytes1, bytes2]);
+};
+
 export const exportTawi50ContractorCopies12 = async (
   transaction: WhtTransaction,
   contractor: Contractor,
   business: Business
 ) => {
-  const fields = buildContractorFields(transaction, contractor, business);
-  const [bytes1, bytes2] = await Promise.all([
-    fillPdfForm(getContractorTemplateUrl(1), fields),
-    fillPdfForm(getContractorTemplateUrl(2), fields)
-  ]);
-  const merged = await mergePdfs([bytes1, bytes2]);
+  const merged = await buildWhtTransactionBytes12(transaction, contractor, business);
   downloadPdf(merged, `tawi50-contractor-${contractor.name}-12.pdf`);
+};
+
+export const buildWhtTransactionBytes34 = async (
+  transaction: WhtTransaction,
+  contractor: Contractor,
+  business: Business
+): Promise<Uint8Array> => {
+  const fields = buildContractorFields(transaction, contractor, business);
+  const [bytes3, bytes4] = await Promise.all([
+    fillPdfForm(getContractorTemplateUrl(3), fields),
+    fillPdfForm(getContractorTemplateUrl(4), fields)
+  ]);
+  return mergePdfs([bytes3, bytes4]);
 };
 
 export const exportTawi50ContractorCopies34 = async (
@@ -149,20 +199,14 @@ export const exportTawi50ContractorCopies34 = async (
   contractor: Contractor,
   business: Business
 ) => {
-  const fields = buildContractorFields(transaction, contractor, business);
-  const [bytes3, bytes4] = await Promise.all([
-    fillPdfForm(getContractorTemplateUrl(3), fields),
-    fillPdfForm(getContractorTemplateUrl(4), fields)
-  ]);
-  const merged = await mergePdfs([bytes3, bytes4]);
+  const merged = await buildWhtTransactionBytes34(transaction, contractor, business);
   downloadPdf(merged, `tawi50-contractor-${contractor.name}-34.pdf`);
 };
 
-export const exportPnd1 = async (
+export const buildPnd1Bytes = async (
   record: Pnd1Record,
-  employee: Employee,
   business: Business
-) => {
+): Promise<Uint8Array> => {
   const fields: PdfFieldValues = {
     'Text1.0': business.code ?? '',
     'Text1.2': business.name,
@@ -177,13 +221,20 @@ export const exportPnd1 = async (
     'Text1.13': business.addressDistrict ?? '',
     'Text1.14': business.addressProvince ?? '',
     'Text1.16': business.addressPostalCode ?? '',
-    'Text2.1': (record.income / 100).toFixed(2),
-    'Text2.2': (record.taxWithheld / 100).toFixed(2),
-    'Text2.4': (record.taxWithheld / 100).toFixed(2),
-    'Text2.26': String(record.month),
+    'Text2.1': (record.income).toFixed(2),
+    'Text2.2': (record.taxWithheld).toFixed(2),
+    'Text2.4': (record.taxWithheld).toFixed(2),
+    'Text2.26': String(record.month)
   };
+  return fillPdfForm(pnd1TemplateUrl, fields);
+};
 
+export const exportPnd1 = async (
+  record: Pnd1Record,
+  employee: Employee,
+  business: Business
+) => {
   const monthIndex = record.month - 1;
-  const bytes = await fillPdfForm(pnd1TemplateUrl, fields);
+  const bytes = await buildPnd1Bytes(record, business);
   downloadPdf(bytes, `pnd1-${employee.name}-${MONTH_THAI[monthIndex]}-${record.year}.pdf`);
 };

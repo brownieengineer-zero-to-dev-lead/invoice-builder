@@ -651,5 +651,23 @@
       "noInvoicesText": "Vienetai be sąskaitų"
     },
     "noItem": "Pasirinkite vienetą, kad pamatytumėte detales."
+  },
+  "employees": {
+    "filter": {
+      "allText": "Visi darbuotojai",
+      "activeText": "Aktyvūs darbuotojai",
+      "archivedText": "Archyvuoti darbuotojai",
+      "activeDesc": "Darbuotojai, kurie nėra archyvuoti",
+      "archivedDesc": "Darbuotojai, kurie buvo archyvuoti"
+    }
+  },
+  "contractors": {
+    "filter": {
+      "allText": "Visi rangovai",
+      "activeText": "Aktyvūs rangovai",
+      "archivedText": "Archyvuoti rangovai",
+      "activeDesc": "Rangovai, kurie nėra archyvuoti",
+      "archivedDesc": "Rangovai, kurie buvo archyvuoti"
+    }
   }
 }

@@ -651,5 +651,23 @@
       "noInvoicesText": "Unités n’ayant pas de factures"
     },
     "noItem": "Sélectionnez une unité pour afficher les détails."
+  },
+  "employees": {
+    "filter": {
+      "allText": "Tous les employés",
+      "activeText": "Employés actifs",
+      "archivedText": "Employés archivés",
+      "activeDesc": "Employés non archivés",
+      "archivedDesc": "Employés archivés"
+    }
+  },
+  "contractors": {
+    "filter": {
+      "allText": "Tous les prestataires",
+      "activeText": "Prestataires actifs",
+      "archivedText": "Prestataires archivés",
+      "activeDesc": "Prestataires non archivés",
+      "archivedDesc": "Prestataires archivés"
+    }
   }
 }

@@ -25,10 +25,10 @@ interface FormData {
 
 interface Props {
   contractor?: Contractor;
-  handleChange?: (data: { contractor: FormData; isFormValid: boolean }) => void;
+  onChange: (data: { changedData: FormData; isFormValid: boolean }) => void;
 }
 
-export const Form: FC<Props> = ({ handleChange = () => {}, contractor }) => {
+export const Form: FC<Props> = ({ onChange, contractor }) => {
   const initialFormRef = useRef<FormData | undefined>(undefined);
   const { form, setForm, update } = useForm<FormData>({
     id: contractor?.id,
@@ -76,8 +76,8 @@ export const Form: FC<Props> = ({ handleChange = () => {}, contractor }) => {
 
   useEffect(() => {
     const isFormValid = form.name.trim() !== '' && form.taxId.trim() !== '';
-    handleChange({ contractor: form, isFormValid });
-  }, [form, handleChange]);
+    onChange({ changedData: form, isFormValid });
+  }, [form]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Grid container spacing={2}>

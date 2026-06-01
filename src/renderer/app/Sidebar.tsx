@@ -95,6 +95,56 @@ export const Sidebar: FC = () => {
           : [])
       ]
     },
+    {
+      groupName: 'เอกสารพนักงาน',
+      groupIcon: <BadgeIcon />,
+      isOpen: false,
+      items: [
+        {
+          text: 'ภ.ง.ด.1',
+          icon: <ReceiptIcon />,
+          path: '/pnd1',
+          isToggle: false,
+          minHeight: 50,
+          isSelected: isSelected,
+          onClick: onClickNavigate
+        },
+        {
+          text: '50 ทวิ',
+          icon: <SummarizeIcon />,
+          path: '/tawi50',
+          isToggle: false,
+          minHeight: 50,
+          isSelected: isSelected,
+          onClick: onClickNavigate
+        }
+      ]
+    },
+    {
+      groupName: 'เอกสารผู้รับจ้าง',
+      groupIcon: <EngineeringIcon />,
+      isOpen: false,
+      items: [
+        {
+          text: 'ธุรกรรม',
+          icon: <ReceiptLongIcon />,
+          path: '/wht-transactions',
+          isToggle: false,
+          minHeight: 50,
+          isSelected: isSelected,
+          onClick: onClickNavigate
+        },
+        {
+          text: 'Placeholder',
+          icon: <ReceiptLongIcon />,
+          path: '/wht-transactions',
+          isToggle: false,
+          minHeight: 50,
+          isSelected: isSelected,
+          onClick: onClickNavigate
+        }
+      ]
+    },
     ...(storeSettings?.presetsON || storeSettings?.styleProfilesON
       ? [
           {
@@ -199,14 +249,7 @@ export const Sidebar: FC = () => {
           minHeight: 50,
           isSelected: isSelected,
           onClick: onClickNavigate
-        }
-      ]
-    },
-    {
-      groupName: 'พนักงาน',
-      groupIcon: <BadgeIcon />,
-      isOpen: false,
-      items: [
+        },
         {
           text: 'พนักงาน',
           icon: <BadgeIcon />,
@@ -217,43 +260,9 @@ export const Sidebar: FC = () => {
           onClick: onClickNavigate
         },
         {
-          text: 'ภ.ง.ด.1',
-          icon: <ReceiptIcon />,
-          path: '/pnd1',
-          isToggle: false,
-          minHeight: 50,
-          isSelected: isSelected,
-          onClick: onClickNavigate
-        },
-        {
-          text: '50 ทวิ',
-          icon: <SummarizeIcon />,
-          path: '/tawi50',
-          isToggle: false,
-          minHeight: 50,
-          isSelected: isSelected,
-          onClick: onClickNavigate
-        }
-      ]
-    },
-    {
-      groupName: 'ผู้รับจ้าง',
-      groupIcon: <EngineeringIcon />,
-      isOpen: false,
-      items: [
-        {
           text: 'ผู้รับจ้าง',
           icon: <EngineeringIcon />,
           path: '/contractors',
-          isToggle: false,
-          minHeight: 50,
-          isSelected: isSelected,
-          onClick: onClickNavigate
-        },
-        {
-          text: 'ธุรกรรม',
-          icon: <ReceiptLongIcon />,
-          path: '/wht-transactions',
           isToggle: false,
           minHeight: 50,
           isSelected: isSelected,

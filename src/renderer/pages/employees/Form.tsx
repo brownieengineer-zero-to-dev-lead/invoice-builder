@@ -29,10 +29,10 @@ interface FormData {
 
 interface Props {
   employee?: Employee;
-  handleChange?: (data: { employee: FormData; isFormValid: boolean }) => void;
+  onChange: (data: { changedData: FormData; isFormValid: boolean }) => void;
 }
 
-export const Form: FC<Props> = ({ handleChange = () => {}, employee }) => {
+export const Form: FC<Props> = ({ onChange, employee }) => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const initialFormRef = useRef<FormData | undefined>(undefined);
   const { form, setForm, update } = useForm<FormData>({
@@ -89,8 +89,8 @@ export const Form: FC<Props> = ({ handleChange = () => {}, employee }) => {
 
   useEffect(() => {
     const isFormValid = form.name.trim() !== '' && form.taxId.trim() !== '';
-    handleChange({ employee: form, isFormValid });
-  }, [form, handleChange]);
+    onChange({ changedData: form, isFormValid });
+  }, [form]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Grid container spacing={2}>
