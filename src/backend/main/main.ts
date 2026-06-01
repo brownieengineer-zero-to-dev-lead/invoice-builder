@@ -12,10 +12,11 @@ const devServer = APP_CONFIG.FE_SERVER_URL;
 const dbName = APP_CONFIG.DB_NAME;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+// __dirname = dist-be/backend/main (in packaged app)
 const preloadPath = isDev
   ? join(resolve(), 'dist-be/preload/preload.cjs')
-  : join(app.getAppPath(), 'dist-be/preload/preload.cjs');
-const indexHtmlPath = isDev ? devServer : join(app.getAppPath(), 'dist-fe/index.html');
+  : join(__dirname, '../../preload/preload.cjs');
+const indexHtmlPath = isDev ? devServer : join(__dirname, '../../../dist-fe/index.html');
 
 let mainWindow: BrowserWindow;
 
