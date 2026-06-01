@@ -28,6 +28,17 @@ export const Form: FC<Props> = ({ handleChange = () => {}, business }) => {
     shortName: business?.shortName ?? '',
     role: business?.role ?? '',
     address: business?.address ?? '',
+    addressBuilding: business?.addressBuilding ?? '',
+    addressRoomFloor: business?.addressRoomFloor ?? '',
+    addressVillage: business?.addressVillage ?? '',
+    addressNo: business?.addressNo ?? '',
+    addressMoo: business?.addressMoo ?? '',
+    addressSoi: business?.addressSoi ?? '',
+    addressRoad: business?.addressRoad ?? '',
+    addressSubDistrict: business?.addressSubDistrict ?? '',
+    addressDistrict: business?.addressDistrict ?? '',
+    addressProvince: business?.addressProvince ?? '',
+    addressPostalCode: business?.addressPostalCode ?? '',
     website: business?.website ?? '',
     additional: business?.additional ?? '',
     vatCode: business?.vatCode ?? '',
@@ -101,6 +112,17 @@ export const Form: FC<Props> = ({ handleChange = () => {}, business }) => {
       shortName: business?.shortName ?? '',
       role: business?.role ?? '',
       address: business?.address ?? '',
+      addressBuilding: business?.addressBuilding ?? '',
+      addressRoomFloor: business?.addressRoomFloor ?? '',
+      addressVillage: business?.addressVillage ?? '',
+      addressNo: business?.addressNo ?? '',
+      addressMoo: business?.addressMoo ?? '',
+      addressSoi: business?.addressSoi ?? '',
+      addressRoad: business?.addressRoad ?? '',
+      addressSubDistrict: business?.addressSubDistrict ?? '',
+      addressDistrict: business?.addressDistrict ?? '',
+      addressProvince: business?.addressProvince ?? '',
+      addressPostalCode: business?.addressPostalCode ?? '',
       website: business?.website ?? '',
       additional: business?.additional ?? '',
       vatCode: business?.vatCode ?? '',
@@ -197,6 +219,94 @@ export const Form: FC<Props> = ({ handleChange = () => {}, business }) => {
           helperText={t('common.addressHelper')}
           value={form.address}
           onChange={e => update('address', e.target.value)}
+        />
+      </Grid>
+      <Grid size={{ xs: 6, md: 3 }}>
+        <TextField
+          label="อาคาร"
+          fullWidth
+          value={form.addressBuilding}
+          onChange={e => update('addressBuilding', e.target.value)}
+        />
+      </Grid>
+      <Grid size={{ xs: 6, md: 3 }}>
+        <TextField
+          label="ห้อง/ชั้น"
+          fullWidth
+          value={form.addressRoomFloor}
+          onChange={e => update('addressRoomFloor', e.target.value)}
+        />
+      </Grid>
+      <Grid size={{ xs: 6, md: 3 }}>
+        <TextField
+          label="หมู่บ้าน"
+          fullWidth
+          value={form.addressVillage}
+          onChange={e => update('addressVillage', e.target.value)}
+        />
+      </Grid>
+      <Grid size={{ xs: 6, md: 3 }}>
+        <TextField
+          label="เลขที่"
+          fullWidth
+          value={form.addressNo}
+          onChange={e => update('addressNo', e.target.value)}
+        />
+      </Grid>
+      <Grid size={{ xs: 6, md: 3 }}>
+        <TextField
+          label="หมู่ที่"
+          fullWidth
+          value={form.addressMoo}
+          onChange={e => update('addressMoo', e.target.value)}
+        />
+      </Grid>
+      <Grid size={{ xs: 6, md: 3 }}>
+        <TextField
+          label="ซอย"
+          fullWidth
+          value={form.addressSoi}
+          onChange={e => update('addressSoi', e.target.value)}
+        />
+      </Grid>
+      <Grid size={{ xs: 6, md: 3 }}>
+        <TextField
+          label="ถนน"
+          fullWidth
+          value={form.addressRoad}
+          onChange={e => update('addressRoad', e.target.value)}
+        />
+      </Grid>
+      <Grid size={{ xs: 6, md: 3 }}>
+        <TextField
+          label="ตำบล/แขวง"
+          fullWidth
+          value={form.addressSubDistrict}
+          onChange={e => update('addressSubDistrict', e.target.value)}
+        />
+      </Grid>
+      <Grid size={{ xs: 6, md: 3 }}>
+        <TextField
+          label="อำเภอ/เขต"
+          fullWidth
+          value={form.addressDistrict}
+          onChange={e => update('addressDistrict', e.target.value)}
+        />
+      </Grid>
+      <Grid size={{ xs: 6, md: 3 }}>
+        <TextField
+          label="จังหวัด"
+          fullWidth
+          value={form.addressProvince}
+          onChange={e => update('addressProvince', e.target.value)}
+        />
+      </Grid>
+      <Grid size={{ xs: 6, md: 3 }}>
+        <TextField
+          label="รหัสไปรษณีย์"
+          fullWidth
+          value={form.addressPostalCode}
+          onChange={e => update('addressPostalCode', e.target.value)}
         />
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
