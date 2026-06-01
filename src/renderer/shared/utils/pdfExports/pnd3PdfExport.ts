@@ -2,6 +2,7 @@ import pnd3TemplateUrl from '../../../assets/template-documents/pnd3.pdf';
 import pnd53TemplateUrl from '../../../assets/template-documents/pnd53.pdf';
 import type { Business } from '../../types/business';
 import { downloadPdf, fillPdfForm } from '../pdfFormFiller';
+import { formatIdCard } from './pdfExportHelpers';
 
 export interface TaxReportSummary {
   pndType: string;
@@ -15,7 +16,7 @@ export interface TaxReportSummary {
 const MONTH_THAI = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
 
 const buildFields = (summary: TaxReportSummary, business: Business) => ({
-  'Text1.0': business.code ?? '',
+  'Text1.0': formatIdCard(business.code ?? ''),
   'Text1.2': business.name,
   'Text1.3': business.addressBuilding ?? '',
   'Text1.4': business.addressRoomFloor ?? '',
@@ -31,7 +32,8 @@ const buildFields = (summary: TaxReportSummary, business: Business) => ({
   'Text2.1': summary.totalIncome.toFixed(2),
   'Text2.2': summary.totalTax.toFixed(2),
   'Text2.4': summary.totalTax.toFixed(2),
-  'Text2.26': String(summary.month)
+  // 'Text2.26': String(summary.month),
+  'Radio Button10': summary.month - 1
 });
 
 export const buildPnd3Bytes = async (

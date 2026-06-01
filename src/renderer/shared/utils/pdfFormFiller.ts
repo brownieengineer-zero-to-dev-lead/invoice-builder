@@ -38,6 +38,8 @@ export const fillPdfForm = async (
         const field = form.getCheckBox(name);
         if (value) field.check();
         else field.uncheck();
+      } else if (typeof value === 'number') {
+        form.getRadioGroup(name).select(form.getRadioGroup(name).getOptions()[value]);
       } else {
         const field = form.getTextField(name);
         field.setText(String(value));
