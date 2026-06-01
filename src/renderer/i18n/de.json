@@ -472,7 +472,9 @@
     "taxLabel": "Steuer",
     "termsConditions": "Allgemeine Geschäftsbedingungen",
     "thankNote": "Dankesnotiz",
-    "type": "Typ"
+    "type": "Typ",
+    "pdfRECEIPT": "QUITTUNG",
+    "printReceipt": "Quittung drucken"
   },
   "items": {
     "add": "Artikel hinzufügen",

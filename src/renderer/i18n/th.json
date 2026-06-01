@@ -472,7 +472,9 @@
     "taxLabel": "ภาษี",
     "termsConditions": "ข้อกำหนดและเงื่อนไข",
     "thankNote": "ข้อความขอบคุณ",
-    "type": "ประเภท"
+    "type": "ประเภท",
+    "pdfRECEIPT": "ใบเสร็จรับเงิน",
+    "printReceipt": "พิมพ์ใบเสร็จ"
   },
   "items": {
     "add": "เพิ่มรายการ",

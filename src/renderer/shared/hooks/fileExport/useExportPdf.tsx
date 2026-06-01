@@ -125,9 +125,9 @@ export const createPdfBlob = async (invoiceForm: InvoiceFromData, storeSettings:
   return blob;
 };
 
-export const getPDFFilename = (invoiceForm: InvoiceFromData, storeSettings: Settings) => {
+export const getPDFFilename = (invoiceForm: InvoiceFromData, storeSettings: Settings, isReceipt = false) => {
   const hasInvoicePart = invoiceForm.invoicePrefix || invoiceForm.invoiceNumber || invoiceForm.invoiceSuffix;
-  const subTypeName = invoiceForm.invoiceType === InvoiceType.invoice ? 'Invoice' : 'Quote';
+  const subTypeName = isReceipt ? 'Receipt' : invoiceForm.invoiceType === InvoiceType.invoice ? 'Invoice' : 'Quote';
   const invoiceNumber = `${hasInvoicePart ? '_' : ''}${invoiceForm.invoicePrefix ?? ''}${invoiceForm.invoiceNumber ?? ''}${invoiceForm.invoiceSuffix ?? ''}`;
   const issuedAtDate = invoiceForm?.issuedAt ? parseISO(invoiceForm.issuedAt) : undefined;
   const year = issuedAtDate && storeSettings?.shouldIncludeYear ? `_${issuedAtDate.getFullYear()}` : '';
@@ -170,5 +170,21 @@ export const useExportPdf = (data: { invoiceForm?: InvoiceFromData; storeSetting
     URL.revokeObjectURL(url);
   }, [invoiceForm, storeSettings, pdfTexts]);
 
-  return { exportPdf };
+  const exportReceiptPdf = useCallback(async () => {
+    if (!invoiceForm || !storeSettings) return;
+
+    const receiptTexts = { ...pdfTexts, pdfINVOICE: pdfTexts.pdfRECEIPT };
+    const blob = await createPdfBlob(invoiceForm, storeSettings, receiptTexts);
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+
+    a.href = url;
+    a.download = getPDFFilename(invoiceForm, storeSettings, true);
+    a.click();
+
+    URL.revokeObjectURL(url);
+  }, [invoiceForm, storeSettings, pdfTexts]);
+
+  return { exportPdf, exportReceiptPdf };
 };

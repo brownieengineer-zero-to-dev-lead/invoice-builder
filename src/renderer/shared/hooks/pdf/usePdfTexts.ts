@@ -22,6 +22,7 @@ export const usePdfTexts = (
       paymentInfo: tt('common.paymentInfo'),
       pdfINVOICE: tt('invoices.pdfINVOICE'),
       pdfQUOTE: tt('invoices.pdfQUOTE'),
+      pdfRECEIPT: tt('invoices.pdfRECEIPT'),
       subTotalLabel: tt('invoices.subTotal'),
       discountLabel: tt('invoices.discount'),
       incLabel: tt('invoices.inc'),

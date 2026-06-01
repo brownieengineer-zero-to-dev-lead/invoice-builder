@@ -472,7 +472,9 @@
     "taxLabel": "Tax",
     "termsConditions": "Terms & conditions",
     "thankNote": "Thank you note",
-    "type": "Type"
+    "type": "Type",
+    "pdfRECEIPT": "RECEIPT",
+    "printReceipt": "Print Receipt"
   },
   "items": {
     "add": "Add item",

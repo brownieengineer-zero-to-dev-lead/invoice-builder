@@ -38,6 +38,7 @@ const isPDFText = (value: unknown): value is PDFText => {
     'paymentInfo',
     'pdfINVOICE',
     'pdfQUOTE',
+    'pdfRECEIPT',
     'subTotalLabel',
     'discountLabel',
     'incLabel',

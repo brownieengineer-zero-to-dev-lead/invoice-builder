@@ -41,7 +41,7 @@ import { PageAppBar } from '../pageAppBar/PageAppBar';
 
 interface Props<T, TAdd, TUpdate> {
   componentId: string;
-  renderCustomButtons?: () => React.ReactNode;
+  renderCustomButtons?: (selectedItem?: T) => React.ReactNode;
   title?: string;
   useRetrieve?: (args: { filter?: FilterData[]; onDone?: (data: Response<T[]>) => void }) => {
     items: T[];
@@ -537,7 +537,7 @@ export const CRUDPage = <T, TAdd, TUpdate>(props: Props<T, TAdd, TUpdate>) => {
       isModal={inlineOnAdd ? false : typeof selectedItem === 'undefined'}
       handleClose={() => handleCloseModal(false)}
       handleSave={handleSave}
-      renderCustomButtons={renderCustomButtons}
+      renderCustomButtons={renderCustomButtons ? () => renderCustomButtons(selectedItem) : undefined}
       renderForm={({ onChange }) =>
         form({
           item: selectedItem,

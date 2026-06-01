@@ -472,7 +472,9 @@
     "taxLabel": "TVA",
     "termsConditions": "Termes et conditions",
     "thankNote": "Note de remerciement",
-    "type": "Type"
+    "type": "Type",
+    "pdfRECEIPT": "REÇU",
+    "printReceipt": "Imprimer le reçu"
   },
   "items": {
     "add": "Ajouter un article",

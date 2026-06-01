@@ -11,6 +11,7 @@ export interface PDFText {
   paymentInfo?: string;
   pdfINVOICE?: string;
   pdfQUOTE?: string;
+  pdfRECEIPT?: string;
   subTotalLabel?: string;
   discountLabel?: string;
   incLabel?: string;

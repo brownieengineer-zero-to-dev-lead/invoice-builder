@@ -1,5 +1,6 @@
 import ColorLensIcon from '@mui/icons-material/ColorLens';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import { Box, Fab, Tooltip } from '@mui/material';
 import { memo, useCallback, useMemo, useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,12 +18,18 @@ interface Props {
   invoiceForm?: InvoiceFromData;
   onSaveProfile?: (data: StyleProfileFromData) => void;
   setInvoiceForm?: React.Dispatch<React.SetStateAction<InvoiceFromData | undefined>>;
+  isReceiptMode?: boolean;
 }
-const InvoicesPreviewComponent: FC<Props> = ({ onSaveProfile = () => {}, setInvoiceForm = () => {}, invoiceForm }) => {
+const InvoicesPreviewComponent: FC<Props> = ({
+  onSaveProfile = () => {},
+  setInvoiceForm = () => {},
+  invoiceForm,
+  isReceiptMode = false
+}) => {
   const { t } = useTranslation();
   const storeSettings = useAppSelector(selectSettings);
 
-  const { exportPdf } = useExportPdf({ invoiceForm, storeSettings });
+  const { exportPdf, exportReceiptPdf } = useExportPdf({ invoiceForm, storeSettings });
 
   const [isDropdownOpenCustomization, setIsDropdownOpenCustomization] = useState<boolean>(false);
 
@@ -115,7 +122,7 @@ const InvoicesPreviewComponent: FC<Props> = ({ onSaveProfile = () => {}, setInvo
 
   return (
     <Box sx={{ height: '100%' }}>
-      <PreviewCore invoiceForm={invoiceForm} />
+      <PreviewCore invoiceForm={invoiceForm} isReceiptMode={isReceiptMode} />
       <CustomizationDropdown
         language={invoiceForm?.language}
         data={customizationData}
@@ -125,21 +132,39 @@ const InvoicesPreviewComponent: FC<Props> = ({ onSaveProfile = () => {}, setInvo
         onClick={handleOnClickCustomization}
         onSaveProfile={onSaveProfile}
       />
-      <Tooltip title={t('common.exportPDF')}>
-        <Fab
-          color="error"
-          aria-label={t('common.exportPDF')}
-          onClick={exportPdf}
-          sx={{
-            position: 'fixed',
-            bottom: 40,
-            right: 110,
-            zIndex: 1000
-          }}
-        >
-          <PictureAsPdfIcon />
-        </Fab>
-      </Tooltip>
+      {isReceiptMode ? (
+        <Tooltip title={t('invoices.printReceipt')}>
+          <Fab
+            color="success"
+            aria-label={t('invoices.printReceipt')}
+            onClick={exportReceiptPdf}
+            sx={{
+              position: 'fixed',
+              bottom: 40,
+              right: 110,
+              zIndex: 1000
+            }}
+          >
+            <ReceiptIcon />
+          </Fab>
+        </Tooltip>
+      ) : (
+        <Tooltip title={t('common.exportPDF')}>
+          <Fab
+            color="error"
+            aria-label={t('common.exportPDF')}
+            onClick={exportPdf}
+            sx={{
+              position: 'fixed',
+              bottom: 40,
+              right: 110,
+              zIndex: 1000
+            }}
+          >
+            <PictureAsPdfIcon />
+          </Fab>
+        </Tooltip>
+      )}
       <Tooltip title={t('ariaLabel.customize')}>
         <Fab
           color="secondary"

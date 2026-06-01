@@ -16,8 +16,9 @@ import { PDFDocument } from './PDFDocument';
 
 interface Props {
   invoiceForm?: InvoiceFromData;
+  isReceiptMode?: boolean;
 }
-const PreviewCoreComponent: FC<Props> = ({ invoiceForm }) => {
+const PreviewCoreComponent: FC<Props> = ({ invoiceForm, isReceiptMode = false }) => {
   const storeSettings = useAppSelector(selectSettings);
   const [logoUrl, setLogoUrl] = useState<string | undefined>();
   const [watermarkUrl, setWatermarkUrl] = useState<string | undefined>();
@@ -32,12 +33,10 @@ const PreviewCoreComponent: FC<Props> = ({ invoiceForm }) => {
   });
   const pdfTexts = useMemo(() => {
     const customLabels = invoiceForm?.invoiceCustomization?.pdfTexts || {};
+    const merged = { ...pdfTextsDefaults, ...customLabels };
 
-    return {
-      ...pdfTextsDefaults,
-      ...customLabels
-    };
-  }, [invoiceForm, pdfTextsDefaults]);
+    return isReceiptMode ? { ...merged, pdfINVOICE: merged.pdfRECEIPT } : merged;
+  }, [invoiceForm, pdfTextsDefaults, isReceiptMode]);
 
   useEffect(() => {
     let cancelled = false;

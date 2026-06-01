@@ -472,7 +472,9 @@
     "taxLabel": "Mokestis",
     "termsConditions": "Sąlygos ir nuostatos",
     "thankNote": "Padėkos pastaba",
-    "type": "Tipas"
+    "type": "Tipas",
+    "pdfRECEIPT": "KVITAS",
+    "printReceipt": "Spausdinti kvitą"
   },
   "items": {
     "add": "Pridėti prekę",

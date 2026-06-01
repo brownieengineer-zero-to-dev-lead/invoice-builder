@@ -27,6 +27,7 @@ interface Props {
   invoice?: Invoice;
   type: InvoiceType;
   mode: InvoiceFormMode;
+  isReceiptMode?: boolean;
   handleChange?: (data: { invoice: InvoiceFromData; isFormValid: boolean; description?: string }) => void;
   handleDelete?: (id: number) => void;
   handleDuplicate?: (id: number, invoiceType: InvoiceType) => void;
@@ -35,6 +36,7 @@ interface Props {
 const InvoiceFormComponent: FC<Props> = ({
   type,
   mode,
+  isReceiptMode = false,
   handleChange = () => {},
   invoice,
   handleDelete = () => {},
@@ -327,6 +329,7 @@ const InvoiceFormComponent: FC<Props> = ({
       setInvoiceForm={setInvoiceForm}
       invoiceForm={deferredInvoiceForm}
       onSaveProfile={handleSaveProfile}
+      isReceiptMode={isReceiptMode}
     />
   );
 };

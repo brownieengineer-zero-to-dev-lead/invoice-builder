@@ -8,9 +8,16 @@ import { InvoiceFormMode } from '../../../shared/enums/invoiceFormMode';
 interface EditPreviewToggleProps {
   mode: InvoiceFormMode;
   setMode: (m: InvoiceFormMode) => void;
+  isReceiptMode?: boolean;
+  onExitReceiptMode?: () => void;
 }
 
-export const EditPreviewToggle: React.FC<EditPreviewToggleProps> = ({ mode, setMode }) => {
+export const EditPreviewToggle: React.FC<EditPreviewToggleProps> = ({
+  mode,
+  setMode,
+  isReceiptMode = false,
+  onExitReceiptMode
+}) => {
   const { t } = useTranslation();
 
   const handleMode = (_event: React.MouseEvent<HTMLElement>, newMode: InvoiceFormMode | null) => {
@@ -20,7 +27,7 @@ export const EditPreviewToggle: React.FC<EditPreviewToggleProps> = ({ mode, setM
   return (
     <Box sx={{ display: 'grid', gap: 2 }}>
       <ToggleButtonGroup
-        value={mode}
+        value={isReceiptMode ? null : mode}
         exclusive
         onChange={handleMode}
         size="small"
@@ -30,7 +37,12 @@ export const EditPreviewToggle: React.FC<EditPreviewToggleProps> = ({ mode, setM
         <ToggleButton value={InvoiceFormMode.edit} aria-label={t('ariaLabel.edit')} sx={{ minWidth: 70 }}>
           {t('ariaLabel.edit')}
         </ToggleButton>
-        <ToggleButton value={InvoiceFormMode.preview} aria-label={t('ariaLabel.preview')} sx={{ minWidth: 70 }}>
+        <ToggleButton
+          value={InvoiceFormMode.preview}
+          aria-label={t('ariaLabel.preview')}
+          sx={{ minWidth: 70 }}
+          onClick={isReceiptMode ? onExitReceiptMode : undefined}
+        >
           {t('ariaLabel.preview')}
         </ToggleButton>
       </ToggleButtonGroup>

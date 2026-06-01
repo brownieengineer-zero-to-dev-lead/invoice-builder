@@ -1,3 +1,5 @@
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import { Button } from '@mui/material';
 import { useCallback, useMemo, useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CRUDPage } from '../../shared/components/layout/crudPage/CRUDPage';
@@ -220,6 +222,7 @@ export const InvoicesPage: FC<Props> = ({ type }) => {
     [type]
   );
   const [mode, setMode] = useState<InvoiceFormMode>(InvoiceFormMode.edit);
+  const [isReceiptMode, setIsReceiptMode] = useState(false);
   const [isAddDropdownOpen, setIsAddDropdownOpen] = useState(false);
   const [openDefaultAdd, setOpenDefaultAdd] = useState<(() => void) | null>(null);
   const [selectedPreset, setSelectedPreset] = useState<Preset | undefined>(undefined);
@@ -229,8 +232,39 @@ export const InvoicesPage: FC<Props> = ({ type }) => {
     <>
       <CRUDPage<Invoice, InvoiceAdd, InvoiceUpdate>
         componentId="invoices"
-        renderCustomButtons={() => {
-          return <EditPreviewToggle mode={mode} setMode={setMode} />;
+        renderCustomButtons={(selectedItem) => {
+          const showReceiptButton =
+            type === InvoiceType.invoice &&
+            selectedItem !== undefined &&
+            (selectedItem.status === InvoiceStatus.paid || selectedItem.status === InvoiceStatus.partiallyPaid);
+
+          return (
+            <>
+              {showReceiptButton && (
+                <Button
+                  size="small"
+                  variant="outlined"
+                  color="success"
+                  startIcon={<ReceiptIcon />}
+                  onClick={() => {
+                    setIsReceiptMode(true);
+                    setMode(InvoiceFormMode.preview);
+                  }}
+                >
+                  {t('invoices.printReceipt')}
+                </Button>
+              )}
+              <EditPreviewToggle
+                mode={mode}
+                setMode={newMode => {
+                  setMode(newMode);
+                  if (newMode === InvoiceFormMode.edit) setIsReceiptMode(false);
+                }}
+                isReceiptMode={isReceiptMode}
+                onExitReceiptMode={() => setIsReceiptMode(false)}
+              />
+            </>
+          );
         }}
         title={type === InvoiceType.quotation ? t('common.quote') : t('common.invoice')}
         filters={filters}
@@ -275,6 +309,7 @@ export const InvoicesPage: FC<Props> = ({ type }) => {
             isSelected={item.id === selectedItem?.id}
             onEdit={(editItem: Invoice) => {
               setSelectedPreset(undefined);
+              setIsReceiptMode(false);
               onEdit(editItem);
             }}
           />
@@ -284,6 +319,7 @@ export const InvoicesPage: FC<Props> = ({ type }) => {
             invoice={item}
             type={type}
             mode={mode}
+            isReceiptMode={isReceiptMode}
             preset={selectedPreset}
             handleDuplicate={(id, invoiceType) => {
               setCurrType(invoiceType);
