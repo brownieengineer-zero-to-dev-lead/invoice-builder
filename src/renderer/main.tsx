@@ -7,6 +7,11 @@ import './globalErrorHandlers';
 import './i18n';
 import { BanksPage } from './pages/banks';
 import { BusinessesPage } from './pages/businesses';
+import { EmployeesPage } from './pages/employees';
+import { ContractorsPage } from './pages/contractors';
+import { Pnd1Page } from './pages/pnd1';
+import { Tawi50Page } from './pages/tawi50';
+import { WhtTransactionsPage } from './pages/whtTransactions';
 import { CategoriesPage } from './pages/categories';
 import { ClientsPage } from './pages/clients';
 import { CurrenciesPage } from './pages/currencies';
@@ -51,6 +56,11 @@ const createRouter = () => {
         { path: 'reports', element: <ReportsPage /> },
         { path: 'banks', element: <BanksPage /> },
         { path: 'presets', element: <PresetsPage /> },
+        { path: 'employees', element: <EmployeesPage /> },
+        { path: 'contractors', element: <ContractorsPage /> },
+        { path: 'pnd1', element: <Pnd1Page /> },
+        { path: 'tawi50', element: <Tawi50Page /> },
+        { path: 'wht-transactions', element: <WhtTransactionsPage /> },
         { path: '*', element: <Navigate to="/invoices" replace /> }
       ]
     }

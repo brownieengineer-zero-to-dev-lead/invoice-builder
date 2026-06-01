@@ -12,11 +12,15 @@ import {
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import BadgeIcon from '@mui/icons-material/Badge';
 import CategoryIcon from '@mui/icons-material/Category';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import EngineeringIcon from '@mui/icons-material/Engineering';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import ScaleIcon from '@mui/icons-material/Scale';
+import SummarizeIcon from '@mui/icons-material/Summarize';
 import ViewModule from '@mui/icons-material/ViewModule';
 import { Box, Divider, Drawer, IconButton, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -191,6 +195,65 @@ export const Sidebar: FC = () => {
           text: t('menuItems.businesses'),
           icon: <Business />,
           path: '/businesses',
+          isToggle: false,
+          minHeight: 50,
+          isSelected: isSelected,
+          onClick: onClickNavigate
+        }
+      ]
+    },
+    {
+      groupName: 'พนักงาน',
+      groupIcon: <BadgeIcon />,
+      isOpen: false,
+      items: [
+        {
+          text: 'พนักงาน',
+          icon: <BadgeIcon />,
+          path: '/employees',
+          isToggle: false,
+          minHeight: 50,
+          isSelected: isSelected,
+          onClick: onClickNavigate
+        },
+        {
+          text: 'ภ.ง.ด.1',
+          icon: <ReceiptIcon />,
+          path: '/pnd1',
+          isToggle: false,
+          minHeight: 50,
+          isSelected: isSelected,
+          onClick: onClickNavigate
+        },
+        {
+          text: '50 ทวิ',
+          icon: <SummarizeIcon />,
+          path: '/tawi50',
+          isToggle: false,
+          minHeight: 50,
+          isSelected: isSelected,
+          onClick: onClickNavigate
+        }
+      ]
+    },
+    {
+      groupName: 'ผู้รับจ้าง',
+      groupIcon: <EngineeringIcon />,
+      isOpen: false,
+      items: [
+        {
+          text: 'ผู้รับจ้าง',
+          icon: <EngineeringIcon />,
+          path: '/contractors',
+          isToggle: false,
+          minHeight: 50,
+          isSelected: isSelected,
+          onClick: onClickNavigate
+        },
+        {
+          text: 'ธุรกรรม',
+          icon: <ReceiptLongIcon />,
+          path: '/wht-transactions',
           isToggle: false,
           minHeight: 50,
           isSelected: isSelected,
