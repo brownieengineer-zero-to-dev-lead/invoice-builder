@@ -48,7 +48,7 @@ const ItemsInfoComponent: FC<Props> = ({ invoiceForm, storeSettings, labels }) =
       weights.rowNo = { width: FIXED_COLUMNS.rowNo };
     }
     if (invoiceForm?.invoiceCustomization?.showQuantity) {
-      weights.quantity = { width: FIXED_COLUMNS.quantity };
+      weights.quantity = { width: FIXED_COLUMNS.quantity, flexShrink: 0 };
     }
     if (invoiceForm?.invoiceCustomization?.showUnit) {
       weights.unit = { width: FIXED_COLUMNS.unit };
@@ -297,7 +297,7 @@ const ItemsInfoComponent: FC<Props> = ({ invoiceForm, storeSettings, labels }) =
                       }
                     ]}
                   >
-                    {qtyLabel}
+                    {qtyLabel + ' '}
                   </Text>
                 </View>
               );
@@ -387,7 +387,7 @@ const ItemsInfoComponent: FC<Props> = ({ invoiceForm, storeSettings, labels }) =
           }
         })}
       </View>
-      {invoiceForm?.invoiceItems?.map((item, index) => {
+      {invoiceForm?.invoiceItems?.map((item, itemIndex) => {
         const { quantity, taxType, taxRate, invoiceItemSnapshot, customField } = item;
         const { unitPriceCents = '0', itemName, unitName } = invoiceItemSnapshot;
 
@@ -410,12 +410,12 @@ const ItemsInfoComponent: FC<Props> = ({ invoiceForm, storeSettings, labels }) =
 
         return (
           <View
-            key={`invoice-item-prev-${item.itemId}-${index}`}
+            key={`invoice-item-prev-${item.itemId}-${itemIndex}`}
             style={[
               PDF_STYLES.row,
               {
                 borderBottom: rowStyle.borderBottom,
-                backgroundColor: index % 2 === 1 ? rowStyle.backgroundColor : undefined
+                backgroundColor: itemIndex % 2 === 1 ? rowStyle.backgroundColor : undefined
               }
             ]}
           >
@@ -442,7 +442,7 @@ const ItemsInfoComponent: FC<Props> = ({ invoiceForm, storeSettings, labels }) =
                           }
                         ]}
                       >
-                        {index + 1}
+                        {itemIndex + 1}
                       </Text>
                     </View>
                   );
