@@ -32,6 +32,11 @@ import type {
 } from '../types/styleProfiles';
 import type { Unit, UnitAdd, UnitUpdate } from '../types/unit';
 import type { ProgressInfo } from '../types/updater';
+import type { Employee, EmployeeAdd, EmployeeUpdate } from '../types/employee';
+import type { Contractor, ContractorAdd, ContractorUpdate } from '../types/contractor';
+import type { Pnd1Record, Pnd1RecordAdd, Pnd1RecordUpdate } from '../types/pnd1Record';
+import type { Tawi50EmployeeRecord, Tawi50EmployeeRecordAdd, Tawi50EmployeeRecordUpdate } from '../types/tawi50EmployeeRecord';
+import type { WhtTransaction, WhtTransactionAdd, WhtTransactionUpdate } from '../types/whtTransaction';
 import { base64ToBytes, toDataUrl } from '../utils/dataUrlFunctions';
 
 const fileToBase64 = async (file?: Uint8Array | null) => {
@@ -495,6 +500,63 @@ export const webApi = () => {
       URL.revokeObjectURL(a.href);
       return { success: true, data: { filePath: a.download } };
     },
+
+    getAllEmployees: (showArchived?: boolean): Promise<Response<Employee[]>> =>
+      apiGet<Response<Employee[]>>('/api/employees', showArchived ? { showArchived: 'true' } : undefined),
+    getEmployeeById: (id: number): Promise<Response<Employee>> =>
+      apiGet<Response<Employee>>(`/api/employees/${id}`),
+    addEmployee: (data: EmployeeAdd): Promise<Response<Employee>> =>
+      apiPost<Response<Employee>>('/api/employees', data),
+    updateEmployee: (data: EmployeeUpdate): Promise<Response<Employee>> =>
+      apiPut<Response<Employee>>('/api/employees', data),
+    deleteEmployee: (id: number): Promise<Response<unknown>> =>
+      apiDelete<Response<unknown>>(`/api/employees/${id}`),
+
+    getAllContractors: (showArchived?: boolean): Promise<Response<Contractor[]>> =>
+      apiGet<Response<Contractor[]>>('/api/contractors', showArchived ? { showArchived: 'true' } : undefined),
+    getContractorById: (id: number): Promise<Response<Contractor>> =>
+      apiGet<Response<Contractor>>(`/api/contractors/${id}`),
+    addContractor: (data: ContractorAdd): Promise<Response<Contractor>> =>
+      apiPost<Response<Contractor>>('/api/contractors', data),
+    updateContractor: (data: ContractorUpdate): Promise<Response<Contractor>> =>
+      apiPut<Response<Contractor>>('/api/contractors', data),
+    deleteContractor: (id: number): Promise<Response<unknown>> =>
+      apiDelete<Response<unknown>>(`/api/contractors/${id}`),
+
+    getAllPnd1Records: (filter?: { employeeId?: number; month?: number; year?: number }): Promise<Response<Pnd1Record[]>> =>
+      apiGet<Response<Pnd1Record[]>>('/api/pnd1-records', filter as Record<string, string> | undefined),
+    getPnd1RecordById: (id: number): Promise<Response<Pnd1Record>> =>
+      apiGet<Response<Pnd1Record>>(`/api/pnd1-records/${id}`),
+    addPnd1Record: (data: Pnd1RecordAdd): Promise<Response<Pnd1Record>> =>
+      apiPost<Response<Pnd1Record>>('/api/pnd1-records', data),
+    updatePnd1Record: (data: Pnd1RecordUpdate): Promise<Response<Pnd1Record>> =>
+      apiPut<Response<Pnd1Record>>('/api/pnd1-records', data),
+    deletePnd1Record: (id: number): Promise<Response<unknown>> =>
+      apiDelete<Response<unknown>>(`/api/pnd1-records/${id}`),
+
+    getAllTawi50EmployeeRecords: (filter?: { employeeId?: number; taxYear?: number }): Promise<Response<Tawi50EmployeeRecord[]>> =>
+      apiGet<Response<Tawi50EmployeeRecord[]>>('/api/tawi50-employee-records', filter as Record<string, string> | undefined),
+    getTawi50EmployeeRecordById: (id: number): Promise<Response<Tawi50EmployeeRecord>> =>
+      apiGet<Response<Tawi50EmployeeRecord>>(`/api/tawi50-employee-records/${id}`),
+    addTawi50EmployeeRecord: (data: Tawi50EmployeeRecordAdd): Promise<Response<Tawi50EmployeeRecord>> =>
+      apiPost<Response<Tawi50EmployeeRecord>>('/api/tawi50-employee-records', data),
+    updateTawi50EmployeeRecord: (data: Tawi50EmployeeRecordUpdate): Promise<Response<Tawi50EmployeeRecord>> =>
+      apiPut<Response<Tawi50EmployeeRecord>>('/api/tawi50-employee-records', data),
+    deleteTawi50EmployeeRecord: (id: number): Promise<Response<unknown>> =>
+      apiDelete<Response<unknown>>(`/api/tawi50-employee-records/${id}`),
+
+    getAllWhtTransactions: (filter?: { contractorId?: number; pndType?: string; month?: number; year?: number }): Promise<Response<WhtTransaction[]>> =>
+      apiGet<Response<WhtTransaction[]>>('/api/wht-transactions', filter as Record<string, string> | undefined),
+    getWhtTransactionById: (id: number): Promise<Response<WhtTransaction>> =>
+      apiGet<Response<WhtTransaction>>(`/api/wht-transactions/${id}`),
+    addWhtTransaction: (data: WhtTransactionAdd): Promise<Response<WhtTransaction>> =>
+      apiPost<Response<WhtTransaction>>('/api/wht-transactions', data),
+    updateWhtTransaction: (data: WhtTransactionUpdate): Promise<Response<WhtTransaction>> =>
+      apiPut<Response<WhtTransaction>>('/api/wht-transactions', data),
+    deleteWhtTransaction: (id: number): Promise<Response<unknown>> =>
+      apiDelete<Response<unknown>>(`/api/wht-transactions/${id}`),
+    getWhtTaxReportSummary: (filter: { businessId?: number; month?: number; year?: number; pndType?: string }): Promise<Response<unknown[]>> =>
+      apiGet<Response<unknown[]>>('/api/wht-transactions/summary', filter as Record<string, string> | undefined),
 
     importAllData: (): Promise<Response<unknown>> => {
       return new Promise(resolve => {

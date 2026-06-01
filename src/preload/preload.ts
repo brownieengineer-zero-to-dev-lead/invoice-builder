@@ -16,6 +16,11 @@ import type { SettingsUpdate } from '../renderer/shared/types/settings';
 import type { StyleProfile, StyleProfileAdd, StyleProfileUpdate } from '../renderer/shared/types/styleProfiles';
 import type { UnitAdd, UnitUpdate } from '../renderer/shared/types/unit';
 import type { ProgressInfo } from '../renderer/shared/types/updater';
+import type { Employee } from '../renderer/shared/types/employee';
+import type { Contractor } from '../renderer/shared/types/contractor';
+import type { Pnd1Record } from '../renderer/shared/types/pnd1Record';
+import type { Tawi50EmployeeRecord } from '../renderer/shared/types/tawi50EmployeeRecord';
+import type { WhtTransaction } from '../renderer/shared/types/whtTransaction';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   ping: () => console.log('pong'),
@@ -120,5 +125,40 @@ contextBridge.exposeInMainWorld('electronAPI', {
   addBatchPreset: (data: Preset[]) => ipcRenderer.invoke('batch-add-preset', data),
 
   exportAllData: () => ipcRenderer.invoke('export-all-data'),
-  importAllData: () => ipcRenderer.invoke('import-all-data')
+  importAllData: () => ipcRenderer.invoke('import-all-data'),
+
+  getAllEmployees: (showArchived?: boolean) => ipcRenderer.invoke('get-all-employees', showArchived),
+  getEmployeeById: (id: number) => ipcRenderer.invoke('get-employee-by-id', id),
+  addEmployee: (data: Employee) => ipcRenderer.invoke('add-employee', data),
+  updateEmployee: (data: Employee) => ipcRenderer.invoke('update-employee', data),
+  deleteEmployee: (id: number) => ipcRenderer.invoke('delete-employee', id),
+
+  getAllContractors: (showArchived?: boolean) => ipcRenderer.invoke('get-all-contractors', showArchived),
+  getContractorById: (id: number) => ipcRenderer.invoke('get-contractor-by-id', id),
+  addContractor: (data: Contractor) => ipcRenderer.invoke('add-contractor', data),
+  updateContractor: (data: Contractor) => ipcRenderer.invoke('update-contractor', data),
+  deleteContractor: (id: number) => ipcRenderer.invoke('delete-contractor', id),
+
+  getAllPnd1Records: (filter?: { employeeId?: number; month?: number; year?: number }) =>
+    ipcRenderer.invoke('get-all-pnd1-records', filter),
+  getPnd1RecordById: (id: number) => ipcRenderer.invoke('get-pnd1-record-by-id', id),
+  addPnd1Record: (data: Pnd1Record) => ipcRenderer.invoke('add-pnd1-record', data),
+  updatePnd1Record: (data: Pnd1Record) => ipcRenderer.invoke('update-pnd1-record', data),
+  deletePnd1Record: (id: number) => ipcRenderer.invoke('delete-pnd1-record', id),
+
+  getAllTawi50EmployeeRecords: (filter?: { employeeId?: number; taxYear?: number }) =>
+    ipcRenderer.invoke('get-all-tawi50-employee-records', filter),
+  getTawi50EmployeeRecordById: (id: number) => ipcRenderer.invoke('get-tawi50-employee-record-by-id', id),
+  addTawi50EmployeeRecord: (data: Tawi50EmployeeRecord) => ipcRenderer.invoke('add-tawi50-employee-record', data),
+  updateTawi50EmployeeRecord: (data: Tawi50EmployeeRecord) => ipcRenderer.invoke('update-tawi50-employee-record', data),
+  deleteTawi50EmployeeRecord: (id: number) => ipcRenderer.invoke('delete-tawi50-employee-record', id),
+
+  getAllWhtTransactions: (filter?: { contractorId?: number; pndType?: string; month?: number; year?: number }) =>
+    ipcRenderer.invoke('get-all-wht-transactions', filter),
+  getWhtTransactionById: (id: number) => ipcRenderer.invoke('get-wht-transaction-by-id', id),
+  addWhtTransaction: (data: WhtTransaction) => ipcRenderer.invoke('add-wht-transaction', data),
+  updateWhtTransaction: (data: WhtTransaction) => ipcRenderer.invoke('update-wht-transaction', data),
+  deleteWhtTransaction: (id: number) => ipcRenderer.invoke('delete-wht-transaction', id),
+  getWhtTaxReportSummary: (filter: { businessId?: number; month?: number; year?: number; pndType?: string }) =>
+    ipcRenderer.invoke('get-wht-tax-report-summary', filter)
 });

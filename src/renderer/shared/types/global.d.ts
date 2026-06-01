@@ -19,6 +19,11 @@ import type { Response } from './response';
 import type { StyleProfile, StyleProfileAdd, StyleProfileUpdate } from './styleProfiles';
 import type { Unit, UnitAdd, UnitUpdate } from './unit';
 import type { ProgressInfo } from './updater';
+import type { Employee, EmployeeAdd, EmployeeUpdate } from './employee';
+import type { Contractor, ContractorAdd, ContractorUpdate } from './contractor';
+import type { Pnd1Record, Pnd1RecordAdd, Pnd1RecordUpdate } from './pnd1Record';
+import type { Tawi50EmployeeRecord, Tawi50EmployeeRecordAdd, Tawi50EmployeeRecordUpdate } from './tawi50EmployeeRecord';
+import type { WhtTransaction, WhtTransactionAdd, WhtTransactionUpdate } from './whtTransaction';
 
 declare global {
   interface Window {
@@ -114,6 +119,37 @@ declare global {
 
       exportAllData: () => Promise<Response<ExportMeta>>;
       importAllData: () => Promise<Response<unknown>>;
+
+      getAllEmployees: (showArchived?: boolean) => Promise<Response<Employee[]>>;
+      getEmployeeById: (id: number) => Promise<Response<Employee>>;
+      addEmployee: (data: EmployeeAdd) => Promise<Response<Employee>>;
+      updateEmployee: (data: EmployeeUpdate) => Promise<Response<Employee>>;
+      deleteEmployee: (id: number) => Promise<Response<unknown>>;
+
+      getAllContractors: (showArchived?: boolean) => Promise<Response<Contractor[]>>;
+      getContractorById: (id: number) => Promise<Response<Contractor>>;
+      addContractor: (data: ContractorAdd) => Promise<Response<Contractor>>;
+      updateContractor: (data: ContractorUpdate) => Promise<Response<Contractor>>;
+      deleteContractor: (id: number) => Promise<Response<unknown>>;
+
+      getAllPnd1Records: (filter?: { employeeId?: number; month?: number; year?: number }) => Promise<Response<Pnd1Record[]>>;
+      getPnd1RecordById: (id: number) => Promise<Response<Pnd1Record>>;
+      addPnd1Record: (data: Pnd1RecordAdd) => Promise<Response<Pnd1Record>>;
+      updatePnd1Record: (data: Pnd1RecordUpdate) => Promise<Response<Pnd1Record>>;
+      deletePnd1Record: (id: number) => Promise<Response<unknown>>;
+
+      getAllTawi50EmployeeRecords: (filter?: { employeeId?: number; taxYear?: number }) => Promise<Response<Tawi50EmployeeRecord[]>>;
+      getTawi50EmployeeRecordById: (id: number) => Promise<Response<Tawi50EmployeeRecord>>;
+      addTawi50EmployeeRecord: (data: Tawi50EmployeeRecordAdd) => Promise<Response<Tawi50EmployeeRecord>>;
+      updateTawi50EmployeeRecord: (data: Tawi50EmployeeRecordUpdate) => Promise<Response<Tawi50EmployeeRecord>>;
+      deleteTawi50EmployeeRecord: (id: number) => Promise<Response<unknown>>;
+
+      getAllWhtTransactions: (filter?: { contractorId?: number; pndType?: string; month?: number; year?: number }) => Promise<Response<WhtTransaction[]>>;
+      getWhtTransactionById: (id: number) => Promise<Response<WhtTransaction>>;
+      addWhtTransaction: (data: WhtTransactionAdd) => Promise<Response<WhtTransaction>>;
+      updateWhtTransaction: (data: WhtTransactionUpdate) => Promise<Response<WhtTransaction>>;
+      deleteWhtTransaction: (id: number) => Promise<Response<unknown>>;
+      getWhtTaxReportSummary: (filter: { businessId?: number; month?: number; year?: number; pndType?: string }) => Promise<Response<unknown[]>>;
     };
   }
 }
