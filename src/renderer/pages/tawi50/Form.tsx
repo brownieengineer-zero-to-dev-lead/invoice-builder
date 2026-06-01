@@ -1,6 +1,5 @@
 import {
-  Box, FormControl, Grid, InputLabel, MenuItem, Select, Table, TableBody,
-  TableCell, TableHead, TableRow, TextField, Typography
+  Box, FormControl, Grid, InputLabel, MenuItem, Select, TextField
 } from '@mui/material';
 import { useEffect, useState, type FC } from 'react';
 import { getApi } from '../../shared/api/restApi';
@@ -76,18 +75,6 @@ export const Form: FC<Props> = ({ record, mode = InvoiceFormMode.edit, onChange 
   }, [form]);
 
   const update = (patch: Partial<typeof form>) => setForm(f => ({ ...f, ...patch }));
-
-  const updateItem = (month: number, field: 'income' | 'taxWithheld', value: number) => {
-    setForm(f => {
-      const items = f.incomeItems.map(i => i.month === month ? { ...i, [field]: value } : i);
-      return {
-        ...f,
-        incomeItems: items,
-        totalIncome: items.reduce((s, i) => s + i.income, 0),
-        totalTax: items.reduce((s, i) => s + i.taxWithheld, 0)
-      };
-    });
-  };
 
   const fetchPnd1 = async (employeeId: number, taxYear: number) => {
     const res: Response<Pnd1Record[]> = await getApi().getAllPnd1Records({ employeeId, year: taxYear });
@@ -170,49 +157,6 @@ export const Form: FC<Props> = ({ record, mode = InvoiceFormMode.edit, onChange 
           />
         </Grid>
       </Grid>
-
-      <Box sx={{ mt: 3 }}>
-        <Typography variant="subtitle2" mb={1}>รายการเงินได้รายเดือน</Typography>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>เดือน</TableCell>
-              <TableCell>เงินได้ (บาท)</TableCell>
-              <TableCell>ภาษีหัก (บาท)</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {form.incomeItems.map(item => (
-              <TableRow key={item.month}>
-                <TableCell>{MONTH_NAMES[item.month - 1]}</TableCell>
-                <TableCell>
-                  <TextField
-                    size="small"
-                    type="number"
-                    value={item.income}
-                    onChange={e => updateItem(item.month, 'income', Number(e.target.value))}
-                    sx={{ width: 120 }}
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    size="small"
-                    type="number"
-                    value={item.taxWithheld}
-                    onChange={e => updateItem(item.month, 'taxWithheld', Number(e.target.value))}
-                    sx={{ width: 120 }}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-            <TableRow>
-              <TableCell><strong>รวม</strong></TableCell>
-              <TableCell><strong>{form.totalIncome.toLocaleString()}</strong></TableCell>
-              <TableCell><strong>{form.totalTax.toLocaleString()}</strong></TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </Box>
 
       <EmployeesDropdown
         isOpen={isDropdownOpen}

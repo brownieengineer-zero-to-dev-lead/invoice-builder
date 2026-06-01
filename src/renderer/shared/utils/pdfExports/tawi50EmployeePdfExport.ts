@@ -2,10 +2,11 @@ import type { Business } from '../../types/business';
 import type { Employee } from '../../types/employee';
 import type { Tawi50EmployeeRecord } from '../../types/tawi50EmployeeRecord';
 import { downloadPdf, fillPdfForm } from '../pdfFormFiller';
-import { buildAddress, deliveryMethodCheckField, formatAmount, formatIdCard, thaiDateParts } from './pdfExportHelpers';
+import { bahtToWords } from '../thaiNumberToWords';
+import { buildAddress, deliveryMethodCheckField, formatAmount, formatIdCard, formatThaiDate, thaiDateParts } from './pdfExportHelpers';
 
 const FONT_SIZES: Record<string, number> = {
-  id1: 8, id1_2: 8, name2: 9, date1: 11, 'pay1.0': 11, 'tax1.0': 11
+  // id1: 8, id1_2: 8, name2: 9, date1: 11, 'pay1.0': 11, 'tax1.0': 11
 };
 
 const TEMPLATE_URL = new URL(
@@ -40,9 +41,9 @@ export const buildTawi50Bytes = async (
     date_pay: issuedParts.day,
     month_pay: issuedParts.month,
     year_pay: issuedParts.year,
-    total: formatAmount(record.totalTax),
-    date1: record.issuedDate,
-    'pay1.0': formatAmount(allIncome),
+    total: bahtToWords(record.totalTax),
+    date1: formatThaiDate(record.issuedDate),
+    'pay1.0': formatAmount(allIncome - allTaxWithheld),
     'tax1.0': formatAmount(allTaxWithheld)
   };
 
