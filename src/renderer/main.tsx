@@ -10,6 +10,7 @@ import { BusinessesPage } from './pages/businesses';
 import { EmployeesPage } from './pages/employees';
 import { ContractorsPage } from './pages/contractors';
 import { Pnd1Page } from './pages/pnd1';
+import { Pnd1MonthlyPage } from './pages/pnd1Monthly';
 import { Tawi50Page } from './pages/tawi50';
 import { WhtTransactionsPage } from './pages/whtTransactions';
 import { TaxReportPage } from './pages/taxReport';
@@ -60,6 +61,7 @@ const createRouter = () => {
         { path: 'employees', element: <EmployeesPage /> },
         { path: 'contractors', element: <ContractorsPage /> },
         { path: 'pnd1', element: <Pnd1Page /> },
+        { path: 'pnd1-monthly', element: <Pnd1MonthlyPage /> },
         { path: 'tawi50', element: <Tawi50Page /> },
         { path: 'wht-transactions', element: <WhtTransactionsPage /> },
         { path: 'tax-report', element: <TaxReportPage /> },

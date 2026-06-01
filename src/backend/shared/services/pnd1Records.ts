@@ -1,5 +1,5 @@
 import type { DatabaseAdapter } from '../types/DatabaseAdapter';
-import type { Pnd1Record } from '../types/pnd1Record';
+import type { Pnd1MonthlySummaryRow, Pnd1Record } from '../types/pnd1Record';
 import type { Response } from '../types/response';
 import { getDefaultValue } from '../utils/dbHelper';
 import { mapDatabaseError } from '../utils/errorFunctions';
@@ -104,6 +104,40 @@ export const deletePnd1Record = async (
   try {
     await db.run(`DELETE FROM pnd1_records WHERE "id" = ?`, [id]);
     return { success: true };
+  } catch (error) {
+    return { success: false, ...mapDatabaseError(error, db.type) };
+  }
+};
+
+export interface Pnd1MonthlySummary {
+  month: number;
+  year: number;
+  businessId: number;
+  rows: Pnd1MonthlySummaryRow[];
+  totalIncome: number;
+  totalTax: number;
+}
+
+export const getPnd1MonthlySummary = async (
+  db: DatabaseAdapter,
+  filter: { month: number; year: number; businessId: number }
+): Promise<Response<Pnd1MonthlySummary>> => {
+  try {
+    const rows = await db.all<Pnd1MonthlySummaryRow>(
+      `SELECT p.id, p."employeeId", e."name" AS "employeeName", e."taxId",
+              p."income", p."taxWithheld"
+       FROM pnd1_records p
+       JOIN employees e ON e."id" = p."employeeId"
+       WHERE p."month" = ? AND p."year" = ? AND e."businessId" = ?
+       ORDER BY e."name" ASC`,
+      [filter.month, filter.year, filter.businessId]
+    );
+    const totalIncome = rows.reduce((s, r) => s + r.income, 0);
+    const totalTax = rows.reduce((s, r) => s + r.taxWithheld, 0);
+    return {
+      success: true,
+      data: { month: filter.month, year: filter.year, businessId: filter.businessId, rows, totalIncome, totalTax }
+    };
   } catch (error) {
     return { success: false, ...mapDatabaseError(error, db.type) };
   }

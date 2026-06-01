@@ -1,8 +1,6 @@
 import { Box, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { useEffect, useState, type FC } from 'react';
-import { InvoiceFormMode } from '../../shared/enums/invoiceFormMode';
 import type { Pnd1Record, Pnd1RecordAdd, Pnd1RecordUpdate } from '../../shared/types/pnd1Record';
-import { Pnd1Preview } from './Preview';
 import { EmployeeSelector } from './EmployeeSelector';
 import { EmployeesDropdown } from './EmployeesDropdown';
 
@@ -19,11 +17,10 @@ const defaultValues = (): Pnd1RecordAdd => ({
 
 interface Props {
   record?: Pnd1Record;
-  mode?: InvoiceFormMode;
   onChange: (data: { changedData: Pnd1RecordAdd | Pnd1RecordUpdate; isFormValid: boolean }) => void;
 }
 
-export const Form: FC<Props> = ({ record, mode = InvoiceFormMode.edit, onChange }) => {
+export const Form: FC<Props> = ({ record, onChange }) => {
   const [form, setForm] = useState<Pnd1RecordAdd & { employeeName?: string }>(
     record
       ? { employeeId: record.employeeId, month: record.month, year: record.year, income: record.income, taxWithheld: record.taxWithheld, employeeName: record.employeeName }
@@ -47,10 +44,6 @@ export const Form: FC<Props> = ({ record, mode = InvoiceFormMode.edit, onChange 
   }, [form]);
 
   const update = (patch: Partial<typeof form>) => setForm(f => ({ ...f, ...patch }));
-
-  if (mode === InvoiceFormMode.preview) {
-    return <Pnd1Preview record={record} />;
-  }
 
   return (
     <Box sx={{ p: 2 }}>

@@ -34,7 +34,7 @@ import type { Unit, UnitAdd, UnitUpdate } from '../types/unit';
 import type { ProgressInfo } from '../types/updater';
 import type { Employee, EmployeeAdd, EmployeeUpdate } from '../types/employee';
 import type { Contractor, ContractorAdd, ContractorUpdate } from '../types/contractor';
-import type { Pnd1Record, Pnd1RecordAdd, Pnd1RecordUpdate } from '../types/pnd1Record';
+import type { Pnd1MonthlySummary, Pnd1Record, Pnd1RecordAdd, Pnd1RecordUpdate } from '../types/pnd1Record';
 import type { Tawi50EmployeeRecord, Tawi50EmployeeRecordAdd, Tawi50EmployeeRecordUpdate } from '../types/tawi50EmployeeRecord';
 import type { WhtTransaction, WhtTransactionAdd, WhtTransactionUpdate } from '../types/whtTransaction';
 import { base64ToBytes, toDataUrl } from '../utils/dataUrlFunctions';
@@ -533,6 +533,8 @@ export const webApi = () => {
       apiPut<Response<Pnd1Record>>('/api/pnd1-records', data),
     deletePnd1Record: (id: number): Promise<Response<unknown>> =>
       apiDelete<Response<unknown>>(`/api/pnd1-records/${id}`),
+    getPnd1MonthlySummary: (filter: { month: number; year: number; businessId: number }): Promise<Response<Pnd1MonthlySummary>> =>
+      apiGet<Response<Pnd1MonthlySummary>>('/api/pnd1-monthly-summary', filter as unknown as Record<string, string>),
 
     getAllTawi50EmployeeRecords: (filter?: { employeeId?: number; taxYear?: number }): Promise<Response<Tawi50EmployeeRecord[]>> =>
       apiGet<Response<Tawi50EmployeeRecord[]>>('/api/tawi50-employee-records', filter as Record<string, string> | undefined),

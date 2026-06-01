@@ -21,3 +21,21 @@ export interface Pnd1RecordAdd {
 export interface Pnd1RecordUpdate extends Pnd1RecordAdd {
   id: number;
 }
+
+export interface Pnd1MonthlySummaryRow {
+  id: number;
+  employeeId: number;
+  employeeName: string;
+  taxId: string;
+  income: number;
+  taxWithheld: number;
+}
+
+export interface Pnd1MonthlySummary {
+  month: number;
+  year: number;
+  businessId: number;
+  rows: Pnd1MonthlySummaryRow[];
+  totalIncome: number;
+  totalTax: number;
+}
