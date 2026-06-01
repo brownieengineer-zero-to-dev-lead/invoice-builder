@@ -28,12 +28,11 @@ const buildFields = (summary: TaxReportSummary, business: Business) => ({
   'Text1.12': business.addressSubDistrict ?? '',
   'Text1.13': business.addressDistrict ?? '',
   'Text1.14': business.addressProvince ?? '',
-  'Text1.16': business.addressPostalCode ?? '',
+  'Text1.15': business.addressPostalCode ?? '',
   'Text2.1': summary.totalIncome.toFixed(2),
   'Text2.2': summary.totalTax.toFixed(2),
   'Text2.4': summary.totalTax.toFixed(2),
-  // 'Text2.26': String(summary.month),
-  'Radio Button10': summary.month - 1
+  'Radio Button10': [0, 4, 8, 1, 5, 9, 2, 6, 11, 3, 7, 10][summary.month - 1]
 });
 
 export const buildPnd3Bytes = async (

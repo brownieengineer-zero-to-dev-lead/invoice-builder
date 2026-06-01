@@ -101,9 +101,18 @@ export const Sidebar: FC = () => {
       isOpen: false,
       items: [
         {
-          text: 'ภ.ง.ด.1',
+          text: 'รายการเงินเดือน',
           icon: <ReceiptIcon />,
           path: '/pnd1',
+          isToggle: false,
+          minHeight: 50,
+          isSelected: isSelected,
+          onClick: onClickNavigate
+        },
+        {
+          text: 'ภ.ง.ด.1',
+          icon: <SummarizeIcon />,
+          path: '/pnd1-monthly',
           isToggle: false,
           minHeight: 50,
           isSelected: isSelected,

@@ -9,6 +9,11 @@ export const initPnd1RecordsHandlers = (db: DatabaseAdapter) => {
     async (_event, filter?: { employeeId?: number; month?: number; year?: number }) =>
       pnd1Service.getAllPnd1Records(db, filter)
   );
+  ipcMain.handle(
+    'get-pnd1-monthly-summary',
+    async (_event, filter: { month: number; year: number; businessId: number }) =>
+      pnd1Service.getPnd1MonthlySummary(db, filter)
+  );
   ipcMain.handle('get-pnd1-record-by-id', async (_event, id: number) =>
     pnd1Service.getPnd1RecordById(db, id)
   );

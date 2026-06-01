@@ -1,8 +1,6 @@
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { IconButton, Tooltip } from '@mui/material';
 import { useCallback, useRef, useState, type FC } from 'react';
-import { getApi } from '../../shared/api/restApi';
-import { InvoiceFormMode } from '../../shared/enums/invoiceFormMode';
 import { CRUDPage } from '../../shared/components/layout/crudPage/CRUDPage';
 import { usePnd1RecordAdd } from '../../shared/hooks/pnd1Records/usePnd1RecordAdd';
 import { usePnd1RecordDelete } from '../../shared/hooks/pnd1Records/usePnd1RecordDelete';
@@ -10,19 +8,12 @@ import { usePnd1RecordsRetrieve } from '../../shared/hooks/pnd1Records/usePnd1Re
 import { usePnd1RecordUpdate } from '../../shared/hooks/pnd1Records/usePnd1RecordUpdate';
 import type { Pnd1Record, Pnd1RecordAdd, Pnd1RecordUpdate } from '../../shared/types/pnd1Record';
 import type { Response } from '../../shared/types/response';
-import { exportPnd1 } from '../../shared/utils/whtPdfExport';
-import { EditPreviewToggle } from '../invoices/Form/EditPreviewToggle';
 import { MoreActionDropdown } from './Dropdowns/MoreActionDropdown';
-import { NewActionDropdown } from './Dropdowns/NewActionDropdown';
 import { Form } from './Form';
 import { List } from './List';
 
 export const Pnd1Page: FC = () => {
-  const [isAddDropdownOpen, setIsAddDropdownOpen] = useState(false);
   const [isMoreActionOpen, setIsMoreActionOpen] = useState(false);
-  const [openDefaultAdd, setOpenDefaultAdd] = useState<(() => void) | null>(null);
-  const [mode, setMode] = useState<InvoiceFormMode>(InvoiceFormMode.edit);
-
   const onDeleteRef = useRef<((id: number) => void) | null>(null);
   const selectedItemRef = useRef<Pnd1Record | undefined>(undefined);
 
@@ -58,53 +49,30 @@ export const Pnd1Page: FC = () => {
     []
   );
 
-  const handleExportPDF = async () => {
-    const record = selectedItemRef.current;
-    if (!record) return;
-    const [empRes, bizRes] = await Promise.all([
-      getApi().getAllEmployees(false),
-      getApi().getAllBusinesses()
-    ]);
-    const employee = empRes.data?.find(e => e.id === record.employeeId);
-    if (!employee || !bizRes.data?.length) return;
-    const business = bizRes.data.find(b => b.id === employee.businessId);
-    if (!business) return;
-    await exportPnd1(record, employee, business);
-  };
-
   return (
     <>
       <CRUDPage<Pnd1Record, Pnd1RecordAdd, Pnd1RecordUpdate>
         componentId="pnd1"
         renderCustomButtons={selectedItem => {
           selectedItemRef.current = selectedItem;
-          return (
-            <>
-              <EditPreviewToggle mode={mode} setMode={setMode} />
-              {selectedItem && (
-                <Tooltip title="การดำเนินการเพิ่มเติม">
-                  <IconButton size="small" onClick={() => setIsMoreActionOpen(true)}>
-                    <MoreVertIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-            </>
-          );
+          return selectedItem ? (
+            <Tooltip title="การดำเนินการเพิ่มเติม">
+              <IconButton size="small" onClick={() => setIsMoreActionOpen(true)}>
+                <MoreVertIcon />
+              </IconButton>
+            </Tooltip>
+          ) : null;
         }}
-        leftTitle="ภ.ง.ด.1"
-        title="ภ.ง.ด.1"
-        noItemText="ไม่พบข้อมูล ภ.ง.ด.1"
-        noItemButtonText="เพิ่มข้อมูล ภ.ง.ด.1"
+        leftTitle="รายการเงินเดือน"
+        title="รายการเงินเดือน"
+        noItemText="ไม่พบข้อมูลรายการเงินเดือน"
+        noItemButtonText="เพิ่มรายการเงินเดือน"
         searchField="employeeName"
         inlineOnAdd={true}
         validateAndNormalize={async data => {
           const record = data as Pnd1RecordAdd | Pnd1RecordUpdate;
           if (!record || !record.employeeId) return undefined;
           return record;
-        }}
-        onAddClick={defaultOnAdd => {
-          setOpenDefaultAdd(() => defaultOnAdd);
-          setIsAddDropdownOpen(true);
         }}
         sortOptions={[
           { label: 'เดือน', value: 'month' },
@@ -128,7 +96,6 @@ export const Pnd1Page: FC = () => {
           return (
             <Form
               record={item}
-              mode={mode}
               onChange={({ changedData, isFormValid }) =>
                 onChange({ changedData, isFormValid })
               }
@@ -136,25 +103,14 @@ export const Pnd1Page: FC = () => {
           );
         }}
       />
-      <NewActionDropdown
-        isOpen={isAddDropdownOpen}
-        onClose={() => setIsAddDropdownOpen(false)}
-        onOpen={() => setIsAddDropdownOpen(true)}
-        onNew={() => {
-          setIsAddDropdownOpen(false);
-          if (openDefaultAdd) openDefaultAdd();
-        }}
-      />
       <MoreActionDropdown
         isOpen={isMoreActionOpen}
         onClose={() => setIsMoreActionOpen(false)}
         onOpen={() => setIsMoreActionOpen(true)}
-        onExportPDF={handleExportPDF}
         onDelete={() => {
           const record = selectedItemRef.current;
-          if (record) onDeleteRef.current?.(record.id);
+          if (record?.id) onDeleteRef.current?.(record.id);
         }}
-        showDelete={!!selectedItemRef.current}
       />
     </>
   );

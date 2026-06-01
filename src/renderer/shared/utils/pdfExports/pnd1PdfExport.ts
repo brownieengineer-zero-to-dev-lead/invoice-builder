@@ -1,14 +1,13 @@
 import pnd1TemplateUrl from '../../../assets/template-documents/pnd1.pdf';
 import type { Business } from '../../types/business';
-import type { Employee } from '../../types/employee';
-import type { Pnd1Record } from '../../types/pnd1Record';
+import type { Pnd1MonthlySummary } from '../../types/pnd1Record';
 import { downloadPdf, fillPdfForm } from '../pdfFormFiller';
 import { formatAmount, formatIdCard } from './pdfExportHelpers';
 
 const MONTH_THAI = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
 
-export const buildPnd1Bytes = async (
-  record: Pnd1Record,
+export const buildPnd1MonthlySummaryBytes = async (
+  summary: Pnd1MonthlySummary,
   business: Business
 ): Promise<Uint8Array> => {
   const fields = {
@@ -25,17 +24,20 @@ export const buildPnd1Bytes = async (
     'Text1.13': business.addressDistrict ?? '',
     'Text1.14': business.addressProvince ?? '',
     'Text1.15': business.addressPostalCode ?? '',
-    'Text2.2': formatAmount(record.income),
-    'Text2.3': formatAmount(record.taxWithheld),
+    'Radio Button0': 0,
+    'Radio Button1': summary.month - 1,
+    'Text2.1': String(summary.rows.length),
+    'Text2.2': formatAmount(summary.totalIncome),
+    'Text2.3': formatAmount(summary.totalTax),
+    'Text2.4': formatAmount(summary.totalTax),
   };
   return fillPdfForm(pnd1TemplateUrl, fields);
 };
 
-export const exportPnd1 = async (
-  record: Pnd1Record,
-  employee: Employee,
+export const exportPnd1MonthlySummary = async (
+  summary: Pnd1MonthlySummary,
   business: Business
 ): Promise<void> => {
-  const bytes = await buildPnd1Bytes(record, business);
-  downloadPdf(bytes, `pnd1-${employee.name}-${MONTH_THAI[record.month - 1]}-${record.year}.pdf`);
+  const bytes = await buildPnd1MonthlySummaryBytes(summary, business);
+  downloadPdf(bytes, `pnd1-${MONTH_THAI[summary.month - 1]}-${summary.year}.pdf`);
 };

@@ -18,7 +18,7 @@ import type { UnitAdd, UnitUpdate } from '../renderer/shared/types/unit';
 import type { ProgressInfo } from '../renderer/shared/types/updater';
 import type { Employee } from '../renderer/shared/types/employee';
 import type { Contractor } from '../renderer/shared/types/contractor';
-import type { Pnd1Record } from '../renderer/shared/types/pnd1Record';
+import type { Pnd1Record, Pnd1MonthlySummary } from '../renderer/shared/types/pnd1Record';
 import type { Tawi50EmployeeRecord } from '../renderer/shared/types/tawi50EmployeeRecord';
 import type { WhtTransaction } from '../renderer/shared/types/whtTransaction';
 
@@ -145,6 +145,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   addPnd1Record: (data: Pnd1Record) => ipcRenderer.invoke('add-pnd1-record', data),
   updatePnd1Record: (data: Pnd1Record) => ipcRenderer.invoke('update-pnd1-record', data),
   deletePnd1Record: (id: number) => ipcRenderer.invoke('delete-pnd1-record', id),
+  getPnd1MonthlySummary: (filter: { month: number; year: number; businessId: number }): Promise<import('../renderer/shared/types/response').Response<Pnd1MonthlySummary>> =>
+    ipcRenderer.invoke('get-pnd1-monthly-summary', filter),
 
   getAllTawi50EmployeeRecords: (filter?: { employeeId?: number; taxYear?: number }) =>
     ipcRenderer.invoke('get-all-tawi50-employee-records', filter),

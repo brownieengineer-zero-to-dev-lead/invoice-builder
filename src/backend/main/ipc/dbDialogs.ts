@@ -85,6 +85,7 @@ const resetIPCHandlers = () => {
     'update-pnd1-record',
     'delete-pnd1-record',
     'get-all-pnd1-records',
+    'get-pnd1-monthly-summary',
     'get-tawi50-employee-record-by-id',
     'add-tawi50-employee-record',
     'update-tawi50-employee-record',

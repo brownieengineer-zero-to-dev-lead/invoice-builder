@@ -1,4 +1,4 @@
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, PDFName } from 'pdf-lib';
 import { saveAs } from 'file-saver';
 import thSarabunNewUrl from '../../assets/sarabun-new/THSarabunNew Bold.ttf';
 
@@ -39,7 +39,19 @@ export const fillPdfForm = async (
         if (value) field.check();
         else field.uncheck();
       } else if (typeof value === 'number') {
-        form.getRadioGroup(name).select(form.getRadioGroup(name).getOptions()[value]);
+        const rg = form.getRadioGroup(name);
+        const widgets = rg.acroField.getWidgets();
+        widgets.forEach((widget, i) => {
+          if (i === value) {
+            const onValue = widget.getOnValue();
+            if (onValue) {
+              widget.setAppearanceState(onValue);
+              rg.acroField.setValue(onValue);
+            }
+          } else {
+            widget.setAppearanceState(PDFName.of('Off'));
+          }
+        });
       } else {
         const field = form.getTextField(name);
         field.setText(String(value));
