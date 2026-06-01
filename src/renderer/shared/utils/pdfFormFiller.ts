@@ -1,22 +1,25 @@
 import { PDFDocument } from 'pdf-lib';
 import { saveAs } from 'file-saver';
-import sarabunRegularUrl from '../../assets/sarabun/Sarabun-Regular.ttf';
+import thSarabunNewUrl from '../../assets/sarabun-new/THSarabunNew Bold.ttf';
+
 
 export type PdfFieldValues = Record<string, string | boolean | number | undefined | null>;
 
-const loadSarabunFont = async (): Promise<Uint8Array> => {
-  const res = await fetch(sarabunRegularUrl);
+const loadFont = async (): Promise<Uint8Array> => {
+  const res = await fetch(thSarabunNewUrl);
   return new Uint8Array(await res.arrayBuffer());
 };
+
+const DEFAULT_FONT_SIZE = 14
 
 export const fillPdfForm = async (
   templateUrl: string,
   fieldValues: PdfFieldValues,
-  fontSizes?: Record<string, number>
+  fontSizes?: Record<string, number>,
 ): Promise<Uint8Array> => {
   const [existingPdfBytes, fontBytes, fontkitModule] = await Promise.all([
     fetch(templateUrl).then(r => r.arrayBuffer()),
-    loadSarabunFont(),
+    loadFont(),
     import('@pdf-lib/fontkit'),
   ]);
   const fontkit = fontkitModule.default ?? fontkitModule;
@@ -38,7 +41,8 @@ export const fillPdfForm = async (
       } else {
         const field = form.getTextField(name);
         field.setText(String(value));
-        if (fontSizes?.[name] !== undefined) field.setFontSize(fontSizes[name]);
+        const fontSize = fontSizes?.[name] ?? DEFAULT_FONT_SIZE;
+        if (fontSize !== undefined) field.setFontSize(fontSize);
         field.updateAppearances(font);
       }
     } catch {

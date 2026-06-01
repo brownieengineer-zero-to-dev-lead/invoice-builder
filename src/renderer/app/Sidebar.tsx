@@ -135,9 +135,9 @@ export const Sidebar: FC = () => {
           onClick: onClickNavigate
         },
         {
-          text: 'Placeholder',
-          icon: <ReceiptLongIcon />,
-          path: '/wht-transactions',
+          text: 'รายงานภาษี',
+          icon: <AssessmentIcon />,
+          path: '/tax-report',
           isToggle: false,
           minHeight: 50,
           isSelected: isSelected,
