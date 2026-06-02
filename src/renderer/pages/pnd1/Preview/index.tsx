@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, type FC } from 'react';
 import { useBusinessesRetrieve } from '../../../shared/hooks/businesses/useBusinessesRetrieve';
 import { useEmployeesRetrieve } from '../../../shared/hooks/employees/useEmployeesRetrieve';
 import type { Pnd1Record } from '../../../shared/types/pnd1Record';
-import { buildPnd1Bytes } from '../../../shared/utils/whtPdfExport';
 
 const MONTH_NAMES = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
 
@@ -33,15 +32,6 @@ export const Pnd1Preview: FC<Props> = ({ record }) => {
 
     setError(null);
     setEmployeeName(employee.name);
-    buildPnd1Bytes(record, business)
-      .then(bytes => {
-        const blob = new Blob([bytes], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        setBlobUrl(url);
-        if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
-        prevUrlRef.current = url;
-      })
-      .catch(() => setError('ไม่สามารถสร้าง PDF ได้'));
 
     return () => {
       if (prevUrlRef.current) {
