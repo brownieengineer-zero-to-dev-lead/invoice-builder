@@ -1,4 +1,5 @@
 import type { EInvoice } from '../renderer/shared/enums/einvoice';
+import type { ActivationResult, LicenseState, RevokeResult } from './license';
 import type { Settings, SettingsUpdate } from '../types/settings';
 import type { DatabaseType } from './../enums/databaseType';
 import type { DBInitType } from './../enums/dbInitType';
@@ -150,6 +151,10 @@ declare global {
       updateWhtTransaction: (data: WhtTransactionUpdate) => Promise<Response<WhtTransaction>>;
       deleteWhtTransaction: (id: number) => Promise<Response<unknown>>;
       getWhtTaxReportSummary: (filter: { businessId?: number; month?: number; year?: number; pndType?: string }) => Promise<Response<unknown[]>>;
+
+      getLicenseState: () => Promise<LicenseState>;
+      activateLicense: (activationCode: string, serialNumber: string) => Promise<ActivationResult>;
+      revokeLicense: () => Promise<RevokeResult>;
     };
   }
 }

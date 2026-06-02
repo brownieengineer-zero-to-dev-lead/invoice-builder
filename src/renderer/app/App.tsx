@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ActivationModal } from '../pages/activation/ActivationModal';
+import type { LicenseState } from '../shared/types/license';
 import i18n from '../i18n';
 import { SpinnerOverlay } from '../shared/components/feedback/spinner/SpinnerOverlay';
 import { ToastContainer } from '../shared/components/feedback/toast/toastContainer';
@@ -16,6 +18,11 @@ import { DatabaseChooser } from './DatabaseChooser/DatabaseChooser';
 
 export const App: FC = () => {
   const [dbReady, setDbReady] = useState<boolean>(false);
+  const [licenseState, setLicenseState] = useState<LicenseState | null>(null);
+
+  useEffect(() => {
+    window.electronAPI.getLicenseState().then(setLicenseState);
+  }, []);
   const isLoading = useAppSelector(selectIsLoading);
   const toasts = useAppSelector(selectToasts);
   const isAllowedToLeave = useAppSelector(selectAllowed);
@@ -66,6 +73,12 @@ export const App: FC = () => {
 
   return (
     <>
+      {licenseState?.status === 'unlicensed' && (
+        <ActivationModal
+          requestKey={licenseState.requestKey}
+          onActivated={() => window.electronAPI.getLicenseState().then(setLicenseState)}
+        />
+      )}
       {!dbReady && <DatabaseChooser onDatabaseRead={onDatabaseRead} />}
       {dbReady && (
         <BeforeUnloadProvider value={{ attemptNavigation, setBlocked }}>

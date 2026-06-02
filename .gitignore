@@ -46,3 +46,6 @@ dist-electron
 .mdd/audits/
 # MDD active jobs (ephemeral — deleted on completion)
 .mdd/jobs/
+
+# License keypair — never commit private key
+support-tools/keys/

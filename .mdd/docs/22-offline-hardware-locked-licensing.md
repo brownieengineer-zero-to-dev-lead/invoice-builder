@@ -26,8 +26,8 @@ test_files:
   - src/tests/unit/license.test.ts
 data_flow: greenfield
 last_synced: 2026-06-03
-status: draft
-phase: 1
+status: complete
+phase: all
 mdd_version: 11
 tags: [licensing, hardware-lock, ed25519, activation, revocation, electron, security, keychain, registry]
 path: Settings/License

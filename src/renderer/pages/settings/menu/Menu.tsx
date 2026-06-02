@@ -1,4 +1,5 @@
 import { DarkMode, Description, FileDownload, Language, LightMode } from '@mui/icons-material';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import CoffeeIcon from '@mui/icons-material/Coffee';
@@ -55,6 +56,21 @@ export const Menu: FC<Props> = ({
   const storeSettings = useAppSelector(selectSettings);
   const updateMessage = useAppSelector(selectUpdateMessage);
   const dispatch = useAppDispatch();
+
+  const licenseSection = [
+    {
+      items: [
+        {
+          text: t('settingsMenuItems.titles.license'),
+          description: t('settingsMenuItems.descriptions.license'),
+          icon: <VpnKeyIcon />,
+          isToggle: false,
+          isSelected: MenuItemSettings.License === selectedMenu,
+          onClick: () => onSelected(MenuItemSettings.License)
+        }
+      ]
+    }
+  ];
 
   const personalization = [
     {
@@ -307,6 +323,11 @@ export const Menu: FC<Props> = ({
           >
             {t('menuItems.settings')}
           </Typography>
+          <Card>
+            <CardContent>
+              <MenuList useTooltip={false} items={licenseSection} showText={true} />
+            </CardContent>
+          </Card>
           <Card>
             <CardContent>
               <MenuList useTooltip={false} items={personalization} showText={true} />

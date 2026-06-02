@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
+import type { ActivationResult, LicenseState, RevokeResult } from '../renderer/shared/types/license';
 import type { DBInitType } from '../renderer/shared/enums/dbInitType';
 import type { EInvoice } from '../renderer/shared/enums/einvoice';
 import type { InvoiceType } from '../renderer/shared/enums/invoiceType';
@@ -162,5 +163,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   updateWhtTransaction: (data: WhtTransaction) => ipcRenderer.invoke('update-wht-transaction', data),
   deleteWhtTransaction: (id: number) => ipcRenderer.invoke('delete-wht-transaction', id),
   getWhtTaxReportSummary: (filter: { businessId?: number; month?: number; year?: number; pndType?: string }) =>
-    ipcRenderer.invoke('get-wht-tax-report-summary', filter)
+    ipcRenderer.invoke('get-wht-tax-report-summary', filter),
+
+  getLicenseState: (): Promise<LicenseState> => ipcRenderer.invoke('get-license-state'),
+  activateLicense: (activationCode: string, serialNumber: string): Promise<ActivationResult> =>
+    ipcRenderer.invoke('activate-license', activationCode, serialNumber),
+  revokeLicense: (): Promise<RevokeResult> => ipcRenderer.invoke('revoke-license')
 });

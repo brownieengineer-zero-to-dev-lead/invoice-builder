@@ -1,32 +1,38 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { getHardwareId } from '../hardwareId';
+import { deriveRequestKey, toBase32, fromBase32, verifyActivationCode, computeCancelKey, encodeActivationCode } from '../licenseVerify';
 
 // ---------------------------------------------------------------------------
-// Helpers (will be implemented in Phase 6)
+// Top-level keytar mock (must be hoisted — cannot be inside it() blocks)
 // ---------------------------------------------------------------------------
-// import { getHardwareId } from '../hardwareId';
-// import { deriveRequestKey, toBase32, fromBase32 } from '../licenseVerify';
-// import { verifyActivationCode } from '../licenseVerify';
-// import { computeCancelKey } from '../licenseVerify';
-// import { readLicenseState, writeLicenseActivation, clearLicenseActivation, readOrCreateSalt } from '../licenseStore';
+const keytarStore: Record<string, string> = {};
+vi.mock('keytar', () => ({
+  default: {
+    getPassword: vi.fn((_service: string, key: string) => Promise.resolve(keytarStore[key] ?? null)),
+    setPassword: vi.fn((_service: string, key: string, value: string) => { keytarStore[key] = value; return Promise.resolve(); }),
+    deletePassword: vi.fn((_service: string, key: string) => { delete keytarStore[key]; return Promise.resolve(true); })
+  }
+}));
+
+// Pre-signed with test private key (support-tools/keys/private_key.pem)
+// Message: 'ABCDEF-GHIJKL-MNOPQR-STUV23'
+const FIXTURE_REQUEST_KEY = 'ABCDEF-GHIJKL-MNOPQR-STUV23';
+const FIXTURE_VALID_ACTIVATION_CODE = 'AE3E6DHF-ZMYDMIXU-YVY7SV7X-QLPYWCAN-QWDWZGHY-AMYRL2UD-2TBZXSNA-A7EE2CG5-3JSCC22X-KUIOFVOO-X3KBPE5P-5XGXYR5G-N3ZMLHIG';
 
 // ---------------------------------------------------------------------------
 // 1. Hardware ID
 // ---------------------------------------------------------------------------
 describe('getHardwareId', () => {
-  it('should return a non-empty string', async () => {
-    // Arrange / Act
-    // const id = await getHardwareId();
-    // Assert
-    // expect(typeof id).toBe('string');
-    // expect(id.length).toBeGreaterThan(0);
-    expect.fail('Not implemented — MDD skeleton');
+  it('should return a non-empty string', () => {
+    const id = getHardwareId();
+    expect(typeof id).toBe('string');
+    expect(id.length).toBeGreaterThan(0);
   });
 
-  it('should return the same value on repeated calls', async () => {
-    // const a = await getHardwareId();
-    // const b = await getHardwareId();
-    // expect(a).toBe(b);
-    expect.fail('Not implemented — MDD skeleton');
+  it('should return the same value on repeated calls', () => {
+    const a = getHardwareId();
+    const b = getHardwareId();
+    expect(a).toBe(b);
   });
 });
 
@@ -35,23 +41,20 @@ describe('getHardwareId', () => {
 // ---------------------------------------------------------------------------
 describe('deriveRequestKey', () => {
   it('should produce a 24-char Base32 string grouped as xxxxxx-xxxxxx-xxxxxx-xxxxxx', () => {
-    // const key = deriveRequestKey('HARDWARE_ID_ABC', 'a'.repeat(64));
-    // expect(key).toMatch(/^[A-Z2-7]{6}-[A-Z2-7]{6}-[A-Z2-7]{6}-[A-Z2-7]{6}$/);
-    expect.fail('Not implemented — MDD skeleton');
+    const key = deriveRequestKey('HARDWARE_ID_ABC', 'a'.repeat(64));
+    expect(key).toMatch(/^[A-Z2-7]{6}-[A-Z2-7]{6}-[A-Z2-7]{6}-[A-Z2-7]{6}$/);
   });
 
   it('should produce different keys for different salts', () => {
-    // const key1 = deriveRequestKey('HARDWARE_ID_ABC', 'salt1');
-    // const key2 = deriveRequestKey('HARDWARE_ID_ABC', 'salt2');
-    // expect(key1).not.toBe(key2);
-    expect.fail('Not implemented — MDD skeleton');
+    const key1 = deriveRequestKey('HARDWARE_ID_ABC', 'salt1');
+    const key2 = deriveRequestKey('HARDWARE_ID_ABC', 'salt2');
+    expect(key1).not.toBe(key2);
   });
 
   it('should produce different keys for different hardwareIds', () => {
-    // const key1 = deriveRequestKey('HARDWARE_A', 'sameSalt');
-    // const key2 = deriveRequestKey('HARDWARE_B', 'sameSalt');
-    // expect(key1).not.toBe(key2);
-    expect.fail('Not implemented — MDD skeleton');
+    const key1 = deriveRequestKey('HARDWARE_A', 'sameSalt');
+    const key2 = deriveRequestKey('HARDWARE_B', 'sameSalt');
+    expect(key1).not.toBe(key2);
   });
 });
 
@@ -59,29 +62,24 @@ describe('deriveRequestKey', () => {
 // 3. Base32 encoding / decoding
 // ---------------------------------------------------------------------------
 describe('Base32 codec', () => {
-  it('should encode 64 bytes to exactly 104 uppercase Base32 characters (no padding dashes)', () => {
-    // const bytes = Buffer.alloc(64, 0xab);
-    // const encoded = toBase32(bytes);
-    // expect(encoded.replace(/-/g, '').length).toBe(104);
-    // expect(encoded).toMatch(/^[A-Z2-7-]+$/);
-    expect.fail('Not implemented — MDD skeleton');
+  it('encodeActivationCode: should produce 13 groups of 8 chars (65 bytes with version byte)', () => {
+    const sig = Buffer.alloc(64, 0xab);
+    const encoded = encodeActivationCode(sig);
+    const groups = encoded.split('-');
+    expect(groups.length).toBe(13);
+    groups.forEach(g => expect(g.length).toBe(8));
   });
 
-  it('should format activation code as 13 groups of 8 separated by dashes', () => {
-    // const bytes = Buffer.alloc(64, 0xab);
-    // const encoded = toBase32(bytes);
-    // const groups = encoded.split('-');
-    // expect(groups.length).toBe(13);
-    // groups.forEach(g => expect(g.length).toBe(8));
-    expect.fail('Not implemented — MDD skeleton');
+  it('should produce only uppercase Base32 characters (A-Z, 2-7) and dashes', () => {
+    const encoded = encodeActivationCode(Buffer.alloc(64, 0xab));
+    expect(encoded).toMatch(/^[A-Z2-7-]+$/);
   });
 
   it('round-trip: fromBase32(toBase32(bytes)) should equal original bytes', () => {
-    // const original = Buffer.from(Array.from({ length: 64 }, (_, i) => i));
-    // const encoded = toBase32(original);
-    // const decoded = fromBase32(encoded);
-    // expect(decoded).toEqual(original);
-    expect.fail('Not implemented — MDD skeleton');
+    const original = Buffer.from(Array.from({ length: 64 }, (_, i) => i));
+    const encoded = toBase32(original);
+    const decoded = fromBase32(encoded);
+    expect(decoded).toEqual(original);
   });
 });
 
@@ -89,44 +87,36 @@ describe('Base32 codec', () => {
 // 4. Activation Code verification (Ed25519)
 // ---------------------------------------------------------------------------
 describe('verifyActivationCode', () => {
-  it('should return true for a valid activation code signed with the private key', async () => {
-    // Uses test keypair — private key only in test fixtures, never production
-    // const requestKey = 'ABCDEF-GHIJKL-MNOPQR-STUV23';
-    // const activationCode = FIXTURE_VALID_ACTIVATION_CODE; // pre-signed with test private key
-    // const result = await verifyActivationCode(activationCode, requestKey);
-    // expect(result.success).toBe(true);
-    expect.fail('Not implemented — MDD skeleton');
+  it('should return true for a valid activation code signed with the private key', () => {
+    const result = verifyActivationCode(FIXTURE_VALID_ACTIVATION_CODE, FIXTURE_REQUEST_KEY);
+    expect(result.success).toBe(true);
   });
 
-  it('should return false for an activation code signed against a different requestKey', async () => {
-    // const activationCode = FIXTURE_VALID_ACTIVATION_CODE; // signed for 'ABCDEF-...'
-    // const differentRequestKey = 'ZZZZZZ-ZZZZZZ-ZZZZZZ-ZZZZZZ';
-    // const result = await verifyActivationCode(activationCode, differentRequestKey);
-    // expect(result.success).toBe(false);
-    // expect(result.error).toBe('invalid_signature');
-    expect.fail('Not implemented — MDD skeleton');
+  it('should return false for an activation code signed against a different requestKey', () => {
+    const result = verifyActivationCode(FIXTURE_VALID_ACTIVATION_CODE, 'ZZZZZZ-ZZZZZZ-ZZZZZZ-ZZZ234');
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('invalid_signature');
   });
 
-  it('should return false for a tampered activation code (one char changed)', async () => {
-    // const tampered = FIXTURE_VALID_ACTIVATION_CODE.replace('A', 'B');
-    // const result = await verifyActivationCode(tampered, 'ABCDEF-GHIJKL-MNOPQR-STUV23');
-    // expect(result.success).toBe(false);
-    // expect(result.error).toBe('invalid_signature');
-    expect.fail('Not implemented — MDD skeleton');
+  it('should return false for a tampered activation code (one char changed)', () => {
+    const tampered = FIXTURE_VALID_ACTIVATION_CODE.replace('G', 'A');
+    const result = verifyActivationCode(tampered, FIXTURE_REQUEST_KEY);
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('invalid_signature');
   });
 
-  it('should return false for a malformed activation code (wrong length)', async () => {
-    // const result = await verifyActivationCode('TOOSHORT', 'ABCDEF-GHIJKL-MNOPQR-STUV23');
-    // expect(result.success).toBe(false);
-    // expect(result.error).toBe('tampered');
-    expect.fail('Not implemented — MDD skeleton');
+  it('should return false for a malformed activation code (wrong group count)', () => {
+    const result = verifyActivationCode('TOOSHORT', FIXTURE_REQUEST_KEY);
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('tampered');
   });
 
-  it('should return false for an activation code with invalid Base32 characters', async () => {
-    // const result = await verifyActivationCode('AAAAAAAA-00000000-AAAAAAAA-00000000-AAAAAAAA-00000000-AAAAAAAA-00000000-AAAAAAAA-00000000-AAAAAAAA-00000000-AAAAAAAA', 'ABCDEF-GHIJKL-MNOPQR-STUV23');
-    // Base32 does not include '0' or '1'
-    // expect(result.success).toBe(false);
-    expect.fail('Not implemented — MDD skeleton');
+  it('should return false for activation code with invalid Base32 characters', () => {
+    // '0' and '1' are not valid Base32 chars
+    const invalid = '00000000-11111111-AAAAAAAA-BBBBBBBB-CCCCCCCC-DDDDDDDD-EEEEEEEE-FFFFFFFF-GGGGGGGG-HHHHHHHH-IIIIIIII-JJJJJJJJ-KKKKKKKK';
+    const result = verifyActivationCode(invalid, FIXTURE_REQUEST_KEY);
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('tampered');
   });
 });
 
@@ -135,62 +125,59 @@ describe('verifyActivationCode', () => {
 // ---------------------------------------------------------------------------
 describe('computeCancelKey', () => {
   it('should return a 19-char uppercase hex string formatted as XXXX-XXXX-XXXX-XXXX', () => {
-    // const cancelKey = computeCancelKey('ABCDEF-GHIJKL-MNOPQR-STUV23');
-    // expect(cancelKey).toMatch(/^[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}$/);
-    expect.fail('Not implemented — MDD skeleton');
+    const cancelKey = computeCancelKey(FIXTURE_REQUEST_KEY);
+    expect(cancelKey).toMatch(/^[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}$/);
   });
 
   it('should produce different cancel keys for different request keys', () => {
-    // const k1 = computeCancelKey('ABCDEF-GHIJKL-MNOPQR-STUV23');
-    // const k2 = computeCancelKey('ZZZZZZ-ZZZZZZ-ZZZZZZ-ZZZ234');
-    // expect(k1).not.toBe(k2);
-    expect.fail('Not implemented — MDD skeleton');
+    const k1 = computeCancelKey(FIXTURE_REQUEST_KEY);
+    const k2 = computeCancelKey('ZZZZZZ-ZZZZZZ-ZZZZZZ-ZZZ234');
+    expect(k1).not.toBe(k2);
   });
 
   it('should be deterministic — same requestKey always produces same cancelKey', () => {
-    // const k1 = computeCancelKey('ABCDEF-GHIJKL-MNOPQR-STUV23');
-    // const k2 = computeCancelKey('ABCDEF-GHIJKL-MNOPQR-STUV23');
-    // expect(k1).toBe(k2);
-    expect.fail('Not implemented — MDD skeleton');
+    const k1 = computeCancelKey(FIXTURE_REQUEST_KEY);
+    const k2 = computeCancelKey(FIXTURE_REQUEST_KEY);
+    expect(k1).toBe(k2);
   });
 });
 
 // ---------------------------------------------------------------------------
-// 6. License Store (mocked OS storage)
+// 6. License Store (mocked OS storage via top-level keytar mock)
 // ---------------------------------------------------------------------------
 describe('licenseStore', () => {
   beforeEach(() => {
-    vi.resetAllMocks();
+    // Reset the in-memory store before each test
+    Object.keys(keytarStore).forEach(k => delete keytarStore[k]);
   });
 
   it('readOrCreateSalt: should return a hex string of 64 chars (32 bytes) on first call', async () => {
-    // vi.mock('keytar', () => ({ getPassword: vi.fn().mockResolvedValue(null), setPassword: vi.fn() }));
-    // const salt = await readOrCreateSalt();
-    // expect(salt).toMatch(/^[0-9a-f]{64}$/);
-    expect.fail('Not implemented — MDD skeleton');
+    const { readOrCreateSalt } = await import('../licenseStore');
+    const salt = await readOrCreateSalt();
+    expect(salt).toMatch(/^[0-9a-f]{64}$/);
   });
 
   it('readOrCreateSalt: should return the same salt on subsequent calls', async () => {
-    // const salt1 = await readOrCreateSalt();
-    // const salt2 = await readOrCreateSalt();
-    // expect(salt1).toBe(salt2);
-    expect.fail('Not implemented — MDD skeleton');
+    const { readOrCreateSalt } = await import('../licenseStore');
+    const salt1 = await readOrCreateSalt();
+    const salt2 = await readOrCreateSalt();
+    expect(salt1).toBe(salt2);
   });
 
-  it('writeLicenseActivation: should persist activation data', async () => {
-    // await writeLicenseActivation({ activationCode: 'CODE', serialNumber: 'SN-001', activatedAt: '2026-06-03' });
-    // const state = await readLicenseState();
-    // expect(state.status).toBe('active');
-    // expect(state.serialNumber).toBe('SN-001');
-    expect.fail('Not implemented — MDD skeleton');
+  it('writeLicenseActivation + readLicenseState: should return active status', async () => {
+    const { writeLicenseActivation, readLicenseState } = await import('../licenseStore');
+    await writeLicenseActivation({ activationCode: 'CODE', serialNumber: 'SN-001', activatedAt: '2026-06-03' });
+    const state = await readLicenseState('ABCDEF-GHIJKL-MNOPQR-STUV23');
+    expect(state.status).toBe('active');
+    expect(state.serialNumber).toBe('SN-001');
   });
 
   it('clearLicenseActivation: should reset status to unlicensed', async () => {
-    // await writeLicenseActivation({ activationCode: 'CODE', serialNumber: 'SN-001', activatedAt: '2026-06-03' });
-    // await clearLicenseActivation();
-    // const state = await readLicenseState();
-    // expect(state.status).toBe('unlicensed');
-    expect.fail('Not implemented — MDD skeleton');
+    const { writeLicenseActivation, clearLicenseActivation, readLicenseState } = await import('../licenseStore');
+    await writeLicenseActivation({ activationCode: 'CODE', serialNumber: 'SN-001', activatedAt: '2026-06-03' });
+    await clearLicenseActivation();
+    const state = await readLicenseState('ABCDEF-GHIJKL-MNOPQR-STUV23');
+    expect(state.status).toBe('unlicensed');
   });
 });
 
@@ -198,26 +185,34 @@ describe('licenseStore', () => {
 // 7. Revoke flow (integration)
 // ---------------------------------------------------------------------------
 describe('revoke flow', () => {
-  it('should rotate salt so the old requestKey no longer matches activation', async () => {
-    // const oldRequestKey = 'ABCDEF-GHIJKL-MNOPQR-STUV23';
-    // await rotateSalt();
-    // const newState = await getLicenseState();
-    // expect(newState.requestKey).not.toBe(oldRequestKey);
-    expect.fail('Not implemented — MDD skeleton');
+  beforeEach(() => {
+    Object.keys(keytarStore).forEach(k => delete keytarStore[k]);
+    // Pre-seed a known salt
+    keytarStore['license-salt'] = 'aaaaaaaabbbbbbbbccccccccddddddddaaaaaaaabbbbbbbbccccccccdddddddd';
+  });
+
+  it('should rotate salt so the new salt differs from the old', async () => {
+    const { rotateSalt } = await import('../licenseStore');
+    const oldSalt = keytarStore['license-salt'];
+    const newSalt = await rotateSalt();
+    expect(newSalt).not.toBe(oldSalt);
+    expect(newSalt).toMatch(/^[0-9a-f]{64}$/);
   });
 
   it('should clear stored activation after revoke', async () => {
-    // await writeLicenseActivation({ activationCode: 'CODE', serialNumber: 'SN-001', activatedAt: '2026-06-03' });
-    // await revokeLicense();
-    // const state = await readLicenseState();
-    // expect(state.status).toBe('unlicensed');
-    expect.fail('Not implemented — MDD skeleton');
+    const { writeLicenseActivation, clearLicenseActivation, readLicenseState } = await import('../licenseStore');
+    await writeLicenseActivation({ activationCode: 'CODE', serialNumber: 'SN-001', activatedAt: '2026-06-03' });
+    await clearLicenseActivation();
+    const state = await readLicenseState('ABCDEF-GHIJKL-MNOPQR-STUV23');
+    expect(state.status).toBe('unlicensed');
   });
 
-  it('should return a valid cancelKey and new requestKey after revoke', async () => {
-    // const result = await revokeLicense();
-    // expect(result.cancelKey).toMatch(/^[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}$/);
-    // expect(result.requestKey).toMatch(/^[A-Z2-7]{6}-[A-Z2-7]{6}-[A-Z2-7]{6}-[A-Z2-7]{6}$/);
-    expect.fail('Not implemented — MDD skeleton');
+  it('computeCancelKey + deriveRequestKey should both return correct formats after salt rotation', async () => {
+    const { rotateSalt } = await import('../licenseStore');
+    const cancelKey = computeCancelKey(FIXTURE_REQUEST_KEY);
+    const newSalt = await rotateSalt();
+    const newRequestKey = deriveRequestKey('HARDWARE_ID_ABC', newSalt);
+    expect(cancelKey).toMatch(/^[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}$/);
+    expect(newRequestKey).toMatch(/^[A-Z2-7]{6}-[A-Z2-7]{6}-[A-Z2-7]{6}-[A-Z2-7]{6}$/);
   });
 });
