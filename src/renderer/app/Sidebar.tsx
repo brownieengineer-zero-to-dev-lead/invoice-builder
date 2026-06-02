@@ -110,7 +110,7 @@ export const Sidebar: FC = () => {
           onClick: onClickNavigate
         },
         {
-          text: 'ภ.ง.ด.1',
+          text: 'รายงานภาษี',
           icon: <SummarizeIcon />,
           path: '/pnd1-monthly',
           isToggle: false,

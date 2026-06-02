@@ -202,7 +202,7 @@ export const Pnd1MonthlyPage: FC = () => {
     <Grid size={{ xs: 12, md: 4 }} component="div" sx={{ height: '100%' }}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, height: '100%' }}>
         <Typography variant="h5" noWrap sx={{ color: theme.palette.secondary.main }}>
-          ภ.ง.ด.1
+          รายงานภาษี
         </Typography>
 
         <Stack spacing={2}>
