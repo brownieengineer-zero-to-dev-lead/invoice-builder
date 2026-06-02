@@ -1,6 +1,8 @@
 import { BrowserWindow, ipcMain, shell } from 'electron';
 import type { DatabaseAdapter } from '../../shared/types/DatabaseAdapter';
 import { initAutoUpdaterHandlers } from './autoUpdater';
+import { initLicenseHandlers } from './license';
+// ⚠️  เมื่อเพิ่ม IPC handler ใหม่ อย่าลืม import และเรียกใน initIpcHandler ด้านล่างด้วย
 import { initBanksHandlers } from './banks';
 import { initBusinessesHandlers } from './businesses';
 import { initCategoriesHandlers } from './categories';
@@ -26,6 +28,7 @@ export const initIpcHandler = (db: DatabaseAdapter, mainWindow: BrowserWindow) =
     await shell.openExternal(url);
   });
 
+  initLicenseHandlers();
   initAutoUpdaterHandlers(mainWindow);
   initBusinessesHandlers(db);
   initStyleProfilesHandlers(db);

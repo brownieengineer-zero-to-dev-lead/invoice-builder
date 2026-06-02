@@ -1,52 +1,110 @@
 import { randomBytes } from 'node:crypto';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { app } from 'electron';
 import { LICENSE_SERVICE, LICENSE_SALT_KEY, LICENSE_ACTIVATION_KEY } from './constants';
 import type { LicenseState, StoredActivation } from '../../../renderer/shared/types/license';
 
-// Platform-specific secure storage
+// ---------------------------------------------------------------------------
+// File-based fallback storage (userData) — used when Keychain/Registry fails
+// ---------------------------------------------------------------------------
+function getFallbackPath(): string {
+  return join(app.getPath('userData'), '.license-store.json');
+}
+
+function fallbackRead(key: string): string | null {
+  try {
+    const path = getFallbackPath();
+    if (!existsSync(path)) return null;
+    const store = JSON.parse(readFileSync(path, 'utf8'));
+    return store[key] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function fallbackWrite(key: string, value: string): void {
+  const path = getFallbackPath();
+  let store: Record<string, string> = {};
+  try {
+    if (existsSync(path)) store = JSON.parse(readFileSync(path, 'utf8'));
+  } catch { /* start fresh */ }
+  store[key] = value;
+  writeFileSync(path, JSON.stringify(store), 'utf8');
+}
+
+function fallbackDelete(key: string): void {
+  const path = getFallbackPath();
+  try {
+    if (!existsSync(path)) return;
+    const store: Record<string, string> = JSON.parse(readFileSync(path, 'utf8'));
+    delete store[key];
+    writeFileSync(path, JSON.stringify(store), 'utf8');
+  } catch { /* ignore */ }
+}
+
+// ---------------------------------------------------------------------------
+// Platform-specific secure storage with file fallback
+// ---------------------------------------------------------------------------
 async function secureGet(key: string): Promise<string | null> {
-  if (process.platform === 'darwin' || process.platform === 'linux') {
-    const keytar = await import('keytar');
-    return keytar.default.getPassword(LICENSE_SERVICE, key);
-  } else {
-    return new Promise((resolve) => {
-      const Registry = require('winreg');
-      const reg = new Registry({ hive: Registry.HKCU, key: `\\Software\\InvoiceBuilder` });
-      reg.get(key, (_err: unknown, item: { value: string } | null) => {
-        resolve(item?.value ?? null);
+  try {
+    if (process.platform === 'darwin' || process.platform === 'linux') {
+      const keytar = await import('keytar');
+      return await keytar.default.getPassword(LICENSE_SERVICE, key);
+    } else {
+      return new Promise((resolve) => {
+        const Registry = require('winreg');
+        const reg = new Registry({ hive: Registry.HKCU, key: `\\Software\\InvoiceBuilder` });
+        reg.get(key, (_err: unknown, item: { value: string } | null) => {
+          resolve(item?.value ?? null);
+        });
       });
-    });
+    }
+  } catch {
+    return fallbackRead(key);
   }
 }
 
 async function secureSet(key: string, value: string): Promise<void> {
-  if (process.platform === 'darwin' || process.platform === 'linux') {
-    const keytar = await import('keytar');
-    await keytar.default.setPassword(LICENSE_SERVICE, key, value);
-  } else {
-    return new Promise((resolve, reject) => {
-      const Registry = require('winreg');
-      const reg = new Registry({ hive: Registry.HKCU, key: `\\Software\\InvoiceBuilder` });
-      reg.set(key, Registry.REG_SZ, value, (err: unknown) => {
-        if (err) reject(err);
-        else resolve();
+  try {
+    if (process.platform === 'darwin' || process.platform === 'linux') {
+      const keytar = await import('keytar');
+      await keytar.default.setPassword(LICENSE_SERVICE, key, value);
+    } else {
+      return new Promise((resolve, reject) => {
+        const Registry = require('winreg');
+        const reg = new Registry({ hive: Registry.HKCU, key: `\\Software\\InvoiceBuilder` });
+        reg.set(key, Registry.REG_SZ, value, (err: unknown) => {
+          if (err) reject(err);
+          else resolve();
+        });
       });
-    });
+    }
+  } catch {
+    fallbackWrite(key, value);
   }
 }
 
 async function secureDelete(key: string): Promise<void> {
-  if (process.platform === 'darwin' || process.platform === 'linux') {
-    const keytar = await import('keytar');
-    await keytar.default.deletePassword(LICENSE_SERVICE, key);
-  } else {
-    return new Promise((resolve) => {
-      const Registry = require('winreg');
-      const reg = new Registry({ hive: Registry.HKCU, key: `\\Software\\InvoiceBuilder` });
-      reg.remove(key, () => resolve());
-    });
+  try {
+    if (process.platform === 'darwin' || process.platform === 'linux') {
+      const keytar = await import('keytar');
+      await keytar.default.deletePassword(LICENSE_SERVICE, key);
+    } else {
+      return new Promise((resolve) => {
+        const Registry = require('winreg');
+        const reg = new Registry({ hive: Registry.HKCU, key: `\\Software\\InvoiceBuilder` });
+        reg.remove(key, () => resolve());
+      });
+    }
+  } catch {
+    fallbackDelete(key);
   }
 }
 
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
 export async function readOrCreateSalt(): Promise<string> {
   const existing = await secureGet(LICENSE_SALT_KEY);
   if (existing) return existing;

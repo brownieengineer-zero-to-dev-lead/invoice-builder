@@ -4,7 +4,6 @@ import { dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { APP_CONFIG } from './config';
 import { initDBDialogsHandlers } from './ipc/dbDialogs';
-import { initLicenseHandlers } from './ipc/license';
 
 config();
 
@@ -50,7 +49,6 @@ const createWindow = () => {
 app.whenReady().then(() => {
   createWindow();
   initDBDialogsHandlers(dbName, mainWindow);
-  initLicenseHandlers();
 });
 
 app.on('window-all-closed', () => {
