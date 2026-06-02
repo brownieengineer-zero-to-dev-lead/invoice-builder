@@ -64,7 +64,6 @@ export const fillPdfForm = async (
     }
   }
 
-  form.flatten();
   return pdfDoc.save();
 };
 
