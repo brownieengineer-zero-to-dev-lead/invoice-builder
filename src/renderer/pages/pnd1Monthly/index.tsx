@@ -28,9 +28,10 @@ import { usePnd1MonthlySummary } from '../../shared/hooks/pnd1Records/usePnd1Mon
 import type { Business } from '../../shared/types/business';
 import type { Pnd1MonthlySummary } from '../../shared/types/pnd1Record';
 import {
-  buildPnd1MonthlySummaryBytes,
+  buildPnd1MonthlySummary,
   exportPnd1MonthlySummary
 } from '../../shared/utils/pdfExports/pnd1PdfExport';
+import { getUrlFromPDF } from '../../shared/utils/pdfFormFiller';
 
 const MONTH_THAI = [
   'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
@@ -64,10 +65,9 @@ const PreviewPanel: FC<PreviewPanelProps> = ({ summary, business, hasFilter }) =
     setPdfError(null);
     setBlobUrl(null);
 
-    buildPnd1MonthlySummaryBytes(summary, business)
-      .then(bytes => {
-        const blob = new Blob([bytes], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
+    buildPnd1MonthlySummary(summary, business)
+      .then(async pdf => {
+        const url = await getUrlFromPDF(pdf, 'preview');
         setBlobUrl(url);
         if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
         prevUrlRef.current = url;
@@ -202,7 +202,7 @@ export const Pnd1MonthlyPage: FC = () => {
     <Grid size={{ xs: 12, md: 4 }} component="div" sx={{ height: '100%' }}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, height: '100%' }}>
         <Typography variant="h5" noWrap sx={{ color: theme.palette.secondary.main }}>
-          ภ.ง.ด.1
+          รายงานภาษี
         </Typography>
 
         <Stack spacing={2}>

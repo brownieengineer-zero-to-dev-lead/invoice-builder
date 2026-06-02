@@ -1,7 +1,8 @@
 import pnd3TemplateUrl from '../../../assets/template-documents/pnd3.pdf';
 import pnd53TemplateUrl from '../../../assets/template-documents/pnd53.pdf';
+import type { PDFDocument } from 'pdf-lib';
 import type { Business } from '../../types/business';
-import { downloadPdf, fillPdfForm } from '../pdfFormFiller';
+import { fillForm, getUrlFromPDF, loadPDF } from '../pdfFormFiller';
 import { formatIdCard } from './pdfExportHelpers';
 
 export interface TaxReportSummary {
@@ -35,20 +36,25 @@ const buildFields = (summary: TaxReportSummary, business: Business) => ({
   'Radio Button10': [0, 4, 8, 1, 5, 9, 2, 6, 11, 3, 7, 10][summary.month - 1]
 });
 
-export const buildPnd3Bytes = async (
+export const buildPnd3 = async (
   summary: TaxReportSummary,
-  business: Business
-): Promise<Uint8Array> => {
+  business: Business,
+): Promise<PDFDocument> => {
   const templateUrl = summary.pndType === 'ภ.ง.ด.3' ? pnd3TemplateUrl : pnd53TemplateUrl;
-  return fillPdfForm(templateUrl, buildFields(summary, business));
+  const pdf = await loadPDF(templateUrl);
+  await fillForm(pdf, buildFields(summary, business));
+  return pdf;
 };
 
 export const exportPnd3 = async (
   summary: TaxReportSummary,
-  business: Business
+  business: Business,
 ): Promise<void> => {
-  const bytes = await buildPnd3Bytes(summary, business);
+  const pdf = await buildPnd3(summary, business);
+  const url = await getUrlFromPDF(pdf, 'export');
   const shortType = summary.pndType === 'ภ.ง.ด.3' ? 'pnd3' : 'pnd53';
-  const monthLabel = MONTH_THAI[summary.month - 1];
-  downloadPdf(bytes, `${shortType}-${monthLabel}-${summary.year}.pdf`);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${shortType}-${MONTH_THAI[summary.month - 1]}-${summary.year}.pdf`;
+  a.click();
 };

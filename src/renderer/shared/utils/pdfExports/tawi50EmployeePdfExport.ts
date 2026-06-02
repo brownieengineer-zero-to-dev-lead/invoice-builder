@@ -1,7 +1,8 @@
+import type { PDFDocument } from 'pdf-lib';
 import type { Business } from '../../types/business';
 import type { Employee } from '../../types/employee';
 import type { Tawi50EmployeeRecord } from '../../types/tawi50EmployeeRecord';
-import { downloadPdf, fillPdfForm } from '../pdfFormFiller';
+import { fillForm, getUrlFromPDF, loadPDF } from '../pdfFormFiller';
 import { bahtToWords } from '../thaiNumberToWords';
 import { buildAddress, deliveryMethodCheckField, formatAmount, formatIdCard, formatThaiDate, thaiDateParts } from './pdfExportHelpers';
 
@@ -14,11 +15,11 @@ const TEMPLATE_URL = new URL(
   import.meta.url
 ).href;
 
-export const buildTawi50Bytes = async (
+export const buildTawi50Employee = async (
   record: Tawi50EmployeeRecord,
   employee: Employee,
-  business: Business
-): Promise<Uint8Array> => {
+  business: Business,
+): Promise<PDFDocument> => {
   const issuedParts = thaiDateParts(record.issuedDate ?? new Date());
 
   const allIncome = record.incomeItems.reduce((s, i) => s + i.income, 0);
@@ -47,14 +48,20 @@ export const buildTawi50Bytes = async (
     'tax1.0': formatAmount(allTaxWithheld)
   };
 
-  return fillPdfForm(TEMPLATE_URL, fields, FONT_SIZES);
+  const pdf = await loadPDF(TEMPLATE_URL);
+  await fillForm(pdf, fields, FONT_SIZES);
+  return pdf
 };
 
 export const exportTawi50Employee = async (
   record: Tawi50EmployeeRecord,
   employee: Employee,
-  business: Business
+  business: Business,
 ): Promise<void> => {
-  const bytes = await buildTawi50Bytes(record, employee, business);
-  downloadPdf(bytes, `tawi50-employee-${employee.name}-${record.taxYear}.pdf`);
+  const pdf = await buildTawi50Employee(record, employee, business);
+  const url = await getUrlFromPDF(pdf, 'export');
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `tawi50-employee-${employee.name}-${record.taxYear}.pdf`;
+  a.click();
 };

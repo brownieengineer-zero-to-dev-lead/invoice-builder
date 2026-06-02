@@ -97,6 +97,7 @@ interface Props<T, TAdd, TUpdate> {
   showRightSide?: boolean;
   showAddButton?: boolean;
   onAddClick?: (defaultOnAdd: () => void) => void;
+  renderAboveSort?: ReactNode;
 }
 
 export const CRUDPage = <T, TAdd, TUpdate>(props: Props<T, TAdd, TUpdate>) => {
@@ -143,7 +144,8 @@ export const CRUDPage = <T, TAdd, TUpdate>(props: Props<T, TAdd, TUpdate>) => {
     showRightSide = true,
     showAddButton = true,
     renderCustomButtons = () => null,
-    onAddClick
+    onAddClick,
+    renderAboveSort = null
   } = props;
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
@@ -585,6 +587,8 @@ export const CRUDPage = <T, TAdd, TUpdate>(props: Props<T, TAdd, TUpdate>) => {
         </Box>
 
         <SearchInput value={persistentSearch} onChange={onSearchChanged} />
+
+        {renderAboveSort}
 
         <Box
           sx={{
