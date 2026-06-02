@@ -22,6 +22,8 @@ export default defineConfig({
         'electron-webauthn',
         'electron',
         'sqlite3',
+        'keytar',
+        'winreg',
         'fs',
         'path',
         'url',

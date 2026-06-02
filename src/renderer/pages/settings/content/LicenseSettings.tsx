@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useTranslation } from 'react-i18next';
-import { LicenseState, RevokeResult } from '../../shared/types/license';
+import type { LicenseState, RevokeResult } from '../../../shared/types/license';
 
 interface Props {
   onRevoked: () => void;
