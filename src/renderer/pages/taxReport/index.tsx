@@ -26,7 +26,8 @@ import { NoItem } from '../../shared/components/lists/noItem/NoItem';
 import { Themes } from '../../shared/enums/themes';
 import { useWhtTaxReportSummary } from '../../shared/hooks/whtTransactions/useWhtTaxReportSummary';
 import type { TaxReportSummary } from '../../shared/utils/pdfExports/pnd3PdfExport';
-import { buildPnd3Bytes, exportPnd3 } from '../../shared/utils/pdfExports/pnd3PdfExport';
+import { buildPnd3, exportPnd3 } from '../../shared/utils/pdfExports/pnd3PdfExport';
+import { getUrlFromPDF } from '../../shared/utils/pdfFormFiller';
 
 const MONTH_THAI = [
   'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
@@ -108,10 +109,9 @@ const TaxReportPreview: FC<PreviewProps> = ({ item }) => {
     setError(null);
     setBlobUrl(null);
 
-    buildPnd3Bytes(item, business)
-      .then(bytes => {
-        const blob = new Blob([bytes], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
+    buildPnd3(item, business)
+      .then(async pdf => {
+        const url = await getUrlFromPDF(pdf, 'preview');
         setBlobUrl(url);
         if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
         prevUrlRef.current = url;

@@ -1,15 +1,16 @@
 import pnd1TemplateUrl from '../../../assets/template-documents/pnd1.pdf';
+import type { PDFDocument } from 'pdf-lib';
 import type { Business } from '../../types/business';
 import type { Pnd1MonthlySummary } from '../../types/pnd1Record';
-import { downloadPdf, fillPdfForm } from '../pdfFormFiller';
+import { fillForm, getUrlFromPDF, loadPDF } from '../pdfFormFiller';
 import { formatAmount, formatIdCard } from './pdfExportHelpers';
 
 const MONTH_THAI = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
 
-export const buildPnd1MonthlySummaryBytes = async (
+export const buildPnd1MonthlySummary = async (
   summary: Pnd1MonthlySummary,
-  business: Business
-): Promise<Uint8Array> => {
+  business: Business,
+): Promise<PDFDocument> => {
   const fields = {
     'Text1.0': formatIdCard(business.code ?? ''),
     'Text1.2': business.name,
@@ -31,13 +32,19 @@ export const buildPnd1MonthlySummaryBytes = async (
     'Text2.3': formatAmount(summary.totalTax),
     'Text2.4': formatAmount(summary.totalTax),
   };
-  return fillPdfForm(pnd1TemplateUrl, fields);
+  const pdf = await loadPDF(pnd1TemplateUrl);
+  await fillForm(pdf, fields);
+  return pdf;
 };
 
 export const exportPnd1MonthlySummary = async (
   summary: Pnd1MonthlySummary,
-  business: Business
+  business: Business,
 ): Promise<void> => {
-  const bytes = await buildPnd1MonthlySummaryBytes(summary, business);
-  downloadPdf(bytes, `pnd1-${MONTH_THAI[summary.month - 1]}-${summary.year}.pdf`);
+  const pdf = await buildPnd1MonthlySummary(summary, business);
+  const url = await getUrlFromPDF(pdf, 'export');
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `pnd1-${MONTH_THAI[summary.month - 1]}-${summary.year}.pdf`;
+  a.click();
 };

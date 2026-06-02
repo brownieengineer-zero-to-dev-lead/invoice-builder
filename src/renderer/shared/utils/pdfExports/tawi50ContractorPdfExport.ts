@@ -1,7 +1,8 @@
+import type { PDFDocument } from 'pdf-lib';
 import type { Business } from '../../types/business';
 import type { Contractor } from '../../types/contractor';
 import type { WhtTransaction } from '../../types/whtTransaction';
-import { downloadPdf, fillPdfForm, mergePdfs } from '../pdfFormFiller';
+import { fillForm, getUrlFromPDF, loadPDF, mergePdfDocs } from '../pdfFormFiller';
 import { bahtToWords } from '../thaiNumberToWords';
 import { buildAddress, deliveryMethodCheckField, formatAmount, formatIdCard, formatThaiDate, thaiDateParts } from './pdfExportHelpers';
 
@@ -65,37 +66,52 @@ const buildFields = (
   };
 };
 
-const buildBytes = async (
+const buildWhtTransaction = async (
   transaction: WhtTransaction,
   contractor: Contractor,
   business: Business,
-  copies: [1 | 2 | 3 | 4, 1 | 2 | 3 | 4]
-): Promise<Uint8Array> => {
+  copies: [1 | 2 | 3 | 4, 1 | 2 | 3 | 4],
+  mode: 'preview' | 'export' = 'export',
+): Promise<PDFDocument> => {
   const fields = buildFields(transaction, contractor, business);
-  const [bytesA, bytesB] = await Promise.all(
-    copies.map(n => fillPdfForm(getTemplateUrl(n), fields, FONT_SIZES))
-  );
-  return mergePdfs([bytesA, bytesB]);
+  const [pdfA, pdfB] = await Promise.all(copies.map(n => loadPDF(getTemplateUrl(n))));
+  await Promise.all([fillForm(pdfA, fields, FONT_SIZES), fillForm(pdfB, fields, FONT_SIZES)]);
+  // flatten ก่อน merge เพราะ mergePdfDocs copy แค่ page content ไม่ได้ copy AcroForm
+  if (mode === 'preview') {
+    pdfA.getForm().flatten();
+    pdfB.getForm().flatten();
+  }
+  return mergePdfDocs([pdfA, pdfB]);
 };
 
-export const buildWhtTransactionBytes12 = (
-  transaction: WhtTransaction, contractor: Contractor, business: Business
-) => buildBytes(transaction, contractor, business, [1, 2]);
+export const buildWhtTransaction12 = (
+  transaction: WhtTransaction, contractor: Contractor, business: Business,
+  mode: 'preview' | 'export' = 'export',
+) => buildWhtTransaction(transaction, contractor, business, [1, 2], mode);
 
-export const buildWhtTransactionBytes34 = (
-  transaction: WhtTransaction, contractor: Contractor, business: Business
-) => buildBytes(transaction, contractor, business, [3, 4]);
+export const buildWhtTransaction34 = (
+  transaction: WhtTransaction, contractor: Contractor, business: Business,
+  mode: 'preview' | 'export' = 'export',
+) => buildWhtTransaction(transaction, contractor, business, [3, 4], mode);
 
 export const exportTawi50ContractorCopies12 = async (
-  transaction: WhtTransaction, contractor: Contractor, business: Business
+  transaction: WhtTransaction, contractor: Contractor, business: Business,
 ): Promise<void> => {
-  const merged = await buildWhtTransactionBytes12(transaction, contractor, business);
-  downloadPdf(merged, `tawi50-contractor-${contractor.name}-12.pdf`);
+  const pdf = await buildWhtTransaction12(transaction, contractor, business);
+  const url = await getUrlFromPDF(pdf, 'export');
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `tawi50-contractor-${contractor.name}-12.pdf`;
+  a.click();
 };
 
 export const exportTawi50ContractorCopies34 = async (
-  transaction: WhtTransaction, contractor: Contractor, business: Business
+  transaction: WhtTransaction, contractor: Contractor, business: Business,
 ): Promise<void> => {
-  const merged = await buildWhtTransactionBytes34(transaction, contractor, business);
-  downloadPdf(merged, `tawi50-contractor-${contractor.name}-34.pdf`);
+  const pdf = await buildWhtTransaction34(transaction, contractor, business);
+  const url = await getUrlFromPDF(pdf, 'export');
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `tawi50-contractor-${contractor.name}-34.pdf`;
+  a.click();
 };

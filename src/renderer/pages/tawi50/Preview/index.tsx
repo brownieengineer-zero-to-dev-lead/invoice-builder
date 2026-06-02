@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, type FC } from 'react';
 import { useBusinessesRetrieve } from '../../../shared/hooks/businesses/useBusinessesRetrieve';
 import { useEmployeesRetrieve } from '../../../shared/hooks/employees/useEmployeesRetrieve';
 import type { Tawi50EmployeeRecord } from '../../../shared/types/tawi50EmployeeRecord';
-import { buildTawi50Bytes } from '../../../shared/utils/whtPdfExport';
+import { buildTawi50Employee } from '../../../shared/utils/whtPdfExport';
+import { getUrlFromPDF } from '../../../shared/utils/pdfFormFiller';
 
 interface Props {
   record?: Tawi50EmployeeRecord;
@@ -31,15 +32,12 @@ export const Tawi50Preview: FC<Props> = ({ record }) => {
 
     setError(null);
     setEmployeeName(employee.name);
-    buildTawi50Bytes(record, employee, business)
-      .then(bytes => {
-        const blob = new Blob([bytes], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        setBlobUrl(url);
-        if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
-        prevUrlRef.current = url;
-      })
-      .catch(() => setError('ไม่สามารถสร้าง PDF ได้'));
+    buildTawi50Employee(record, employee, business).then(async(pdf) => {
+      const url = await getUrlFromPDF(pdf, 'preview')
+      setBlobUrl(url);
+      if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
+      prevUrlRef.current = url;
+    }).catch(() => setError('ไม่สามารถสร้าง PDF ได้'))
 
     return () => {
       if (prevUrlRef.current) {
@@ -49,10 +47,16 @@ export const Tawi50Preview: FC<Props> = ({ record }) => {
     };
   }, [record?.id, record?.totalIncome, record?.totalTax, record?.taxYear, record?.deliveryMethod, employees, businesses]);
 
-  const handleDownload = () => {
-    if (!blobUrl || !record) return;
+  const handleDownload = async () => {
+    if (!record) return;
+    const employee = employees.find(e => e.id === record?.employeeId);
+    if (!employee) return;
+    const business = businesses.find(b => b.id === employee.businessId);
+    if (!business) return;
+    const pdf = await buildTawi50Employee(record, employee, business)
+    const url = await getUrlFromPDF(pdf, 'export')
     const a = document.createElement('a');
-    a.href = blobUrl;
+    a.href = url;
     a.download = `tawi50-${employeeName}-${record.taxYear}.pdf`;
     a.click();
   };

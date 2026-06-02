@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, type FC } from 'react';
 import { useBusinessesRetrieve } from '../../../shared/hooks/businesses/useBusinessesRetrieve';
 import { useContractorsRetrieve } from '../../../shared/hooks/contractors/useContractorsRetrieve';
 import type { WhtTransaction } from '../../../shared/types/whtTransaction';
-import { buildWhtTransactionBytes12, buildWhtTransactionBytes34 } from '../../../shared/utils/whtPdfExport';
+import { buildWhtTransaction12, buildWhtTransaction34 } from '../../../shared/utils/whtPdfExport';
+import { getUrlFromPDF } from '../../../shared/utils/pdfFormFiller';
 
 interface Props {
   record?: WhtTransaction;
@@ -33,11 +34,10 @@ export const WhtTransactionPreview: FC<Props> = ({ record, copy }) => {
     setError(null);
     setContractorName(contractor.name);
 
-    const buildFn = copy === '34' ? buildWhtTransactionBytes34 : buildWhtTransactionBytes12;
-    buildFn(record, contractor, business)
-      .then(bytes => {
-        const blob = new Blob([bytes], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
+    const buildFn = copy === '34' ? buildWhtTransaction34 : buildWhtTransaction12;
+    buildFn(record, contractor, business, 'preview')
+      .then(async pdf => {
+        const url = await getUrlFromPDF(pdf, 'preview');
         setBlobUrl(url);
         if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
         prevUrlRef.current = url;
@@ -56,10 +56,17 @@ export const WhtTransactionPreview: FC<Props> = ({ record, copy }) => {
     contractors, businesses, copy
   ]);
 
-  const handleDownload = () => {
-    if (!blobUrl || !record) return;
+  const handleDownload = async () => {
+    if (!record) return;
+    const contractor = contractors.find(c => c.id === record.contractorId);
+    if (!contractor) return;
+    const business = businesses.find(b => b.id === record.businessId);
+    if (!business) return;
+    const buildFn = copy === '34' ? buildWhtTransaction34 : buildWhtTransaction12;
+    const pdf = await buildFn(record, contractor, business);
+    const url = await getUrlFromPDF(pdf, 'export');
     const a = document.createElement('a');
-    a.href = blobUrl;
+    a.href = url;
     a.download = `tawi50-contractor-${contractorName}-${copy}.pdf`;
     a.click();
   };
