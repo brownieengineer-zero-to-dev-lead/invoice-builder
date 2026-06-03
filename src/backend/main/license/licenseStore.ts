@@ -3,6 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { app } from 'electron';
 import { LICENSE_SERVICE, LICENSE_SALT_KEY, LICENSE_ACTIVATION_KEY, LICENSE_CANCEL_KEY } from './constants';
+import { verifyActivationCode } from './licenseVerify';
 import type { LicenseState, StoredActivation } from '../../../renderer/shared/types/license';
 
 // ---------------------------------------------------------------------------
@@ -148,6 +149,8 @@ export async function readLicenseState(requestKey: string): Promise<LicenseState
 
   try {
     const stored: StoredActivation = JSON.parse(raw);
+    const { success } = verifyActivationCode(stored.activationCode, requestKey);
+    if (!success) return { status: 'unlicensed', requestKey, cancelKey };
     return {
       status: 'active',
       requestKey,
