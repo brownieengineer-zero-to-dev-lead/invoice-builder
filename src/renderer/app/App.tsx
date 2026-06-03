@@ -76,6 +76,7 @@ export const App: FC = () => {
       {licenseState?.status === 'unlicensed' && (
         <ActivationModal
           requestKey={licenseState.requestKey}
+          cancelKey={licenseState.cancelKey}
           onActivated={() => window.electronAPI.getLicenseState().then(setLicenseState)}
         />
       )}

@@ -137,6 +137,8 @@
     "buyerReferenceUBL": "Enter the customer's reference or department code (e.g., for Peppol routing)",
     "buyerReferenceXRechnung": "Enter the mandatory Leitweg-ID provided by the German authority (e.g., 991-01234-56)",
     "cancel": "Cancel",
+    "copy": "Copy",
+    "copied": "Copied!",
     "cash": "Cash",
     "category": "Category",
     "checking": "Checking...",
@@ -573,6 +575,7 @@
       "export": "Export your data for backup or to use in other applications.",
       "import": "Import your data from other sources or backup files.",
       "languageFormat": "Language, Amount format, Date format.",
+      "license": "Manage your hardware-locked license, view activation status, or revoke to transfer to another machine.",
       "privacyPolicy": "Feel free to go through our privacy policy.",
       "share": "Share this app with your friends.",
       "support": "Report bugs or suggest improvements via GitHub.",
@@ -595,6 +598,7 @@
       "export": "Export",
       "import": "Import",
       "languageFormat": "Language & Format",
+      "license": "License",
       "privacyPolicy": "Privacy policy",
       "share": "Share App",
       "support": "Support",
@@ -651,6 +655,32 @@
       "noInvoicesText": "Units who do not have invoices"
     },
     "noItem": "Selected a unit to view details."
+  },
+  "license": {
+    "statusSection": "License Status",
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "serialNumber": "Serial number",
+    "activatedAt": "Activated at",
+    "requestKeyLabel": "Hardware Request Key",
+    "requestKeyHint": "Share this key with support to receive your activation code.",
+    "activationTitle": "Activate License",
+    "activationCode": "Activation Code",
+    "activateButton": "Activate",
+    "error": {
+      "invalidSignature": "Invalid license signature. Please check your activation code.",
+      "alreadyActive": "This license is already active on another machine.",
+      "tampered": "License data has been tampered with.",
+      "unknown": "An unknown error occurred. Please contact support."
+    },
+    "revokeSection": "Revoke License",
+    "revokeWarning": "Revoking your license will deactivate this machine. You will receive a cancel key to transfer the license to another device.",
+    "revokeButton": "Revoke License",
+    "cancelKeyLabel": "Cancel Key",
+    "cancelKeyHint": "Send this cancel key to support when activating on a new device.",
+    "cancelKeyPendingWarning": "You have a pending cancel key from a previous revoke. Please send it to support before activating.",
+    "revokeConfirmTitle": "Revoke License?",
+    "revokeConfirmBody": "This will deactivate the license on this machine. A cancel key will be generated for you to use on another device."
   },
   "employees": {
     "filter": {

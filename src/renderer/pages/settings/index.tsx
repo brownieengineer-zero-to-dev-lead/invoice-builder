@@ -240,7 +240,7 @@ export const SettingsPage = () => {
         rightColumn = <LanguageFormat onLanguageFormat={onLanguageFormat} showBack={!isDesktop} onBack={onBack} />;
         break;
       case MenuItemSettings.License:
-        rightColumn = <LicenseSettings onRevoked={onBack} />;
+        rightColumn = <LicenseSettings />;
         break;
       default:
         rightColumn = <NoItem text={t('app.noItems')} />;

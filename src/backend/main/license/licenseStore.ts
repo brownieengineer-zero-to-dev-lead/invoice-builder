@@ -2,7 +2,7 @@ import { randomBytes } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { app } from 'electron';
-import { LICENSE_SERVICE, LICENSE_SALT_KEY, LICENSE_ACTIVATION_KEY } from './constants';
+import { LICENSE_SERVICE, LICENSE_SALT_KEY, LICENSE_ACTIVATION_KEY, LICENSE_CANCEL_KEY } from './constants';
 import type { LicenseState, StoredActivation } from '../../../renderer/shared/types/license';
 
 // ---------------------------------------------------------------------------
@@ -128,9 +128,23 @@ export async function clearLicenseActivation(): Promise<void> {
   await secureDelete(LICENSE_ACTIVATION_KEY);
 }
 
+export async function writeCancelKey(cancelKey: string): Promise<void> {
+  await secureSet(LICENSE_CANCEL_KEY, cancelKey);
+}
+
+export async function readCancelKey(): Promise<string | null> {
+  return secureGet(LICENSE_CANCEL_KEY);
+}
+
+export async function clearCancelKey(): Promise<void> {
+  await secureDelete(LICENSE_CANCEL_KEY);
+}
+
 export async function readLicenseState(requestKey: string): Promise<LicenseState> {
   const raw = await secureGet(LICENSE_ACTIVATION_KEY);
-  if (!raw) return { status: 'unlicensed', requestKey };
+  const cancelKey = await readCancelKey() ?? undefined;
+
+  if (!raw) return { status: 'unlicensed', requestKey, cancelKey };
 
   try {
     const stored: StoredActivation = JSON.parse(raw);
@@ -138,9 +152,10 @@ export async function readLicenseState(requestKey: string): Promise<LicenseState
       status: 'active',
       requestKey,
       serialNumber: stored.serialNumber,
-      activatedAt: stored.activatedAt
+      activatedAt: stored.activatedAt,
+      cancelKey,
     };
   } catch {
-    return { status: 'unlicensed', requestKey };
+    return { status: 'unlicensed', requestKey, cancelKey };
   }
 }

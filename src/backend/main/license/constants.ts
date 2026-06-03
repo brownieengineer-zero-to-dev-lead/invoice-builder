@@ -9,3 +9,4 @@ export const CANCEL_SECRET = 'c7b8781afdc8033045fd93c68f05d539c50c7c2cf354424d20
 export const LICENSE_SERVICE = 'invoice-builder';
 export const LICENSE_SALT_KEY = 'license-salt';
 export const LICENSE_ACTIVATION_KEY = 'license-activation';
+export const LICENSE_CANCEL_KEY = 'license-cancel-key';

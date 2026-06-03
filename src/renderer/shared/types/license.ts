@@ -5,6 +5,7 @@ export type LicenseState = {
   requestKey: string;
   serialNumber?: string;
   activatedAt?: string;
+  cancelKey?: string;
 };
 
 export type ActivationResult = {

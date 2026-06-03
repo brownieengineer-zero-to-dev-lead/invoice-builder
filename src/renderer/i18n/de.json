@@ -137,6 +137,8 @@
     "buyerReferenceUBL": "Geben Sie die Referenz des Kunden oder den Abteilungscode ein (z. B. für das Peppol-Routing)",
     "buyerReferenceXRechnung": "Geben Sie die obligatorische Leitweg-ID der deutschen Behörde ein (z. B. 991-01234-56)",
     "cancel": "Abbrechen",
+    "copy": "Kopieren",
+    "copied": "Kopiert!",
     "cash": "Bargeld",
     "category": "Kategorie",
     "checking": "Wird überprüft...",
@@ -573,6 +575,7 @@
       "export": "Exportieren Sie Ihre Daten zur Sicherung oder zur Verwendung in anderen Anwendungen.",
       "import": "Importieren Sie Ihre Daten aus anderen Quellen oder Sicherungsdateien.",
       "languageFormat": "Sprache, Betragsformat, Datumsformat.",
+      "license": "Verwalten Sie Ihre hardwaregebundene Lizenz, sehen Sie den Aktivierungsstatus oder widerrufen Sie, um auf ein anderes Gerät zu übertragen.",
       "privacyPolicy": "Lesen Sie unsere Datenschutzrichtlinie.",
       "share": "Teilen Sie diese App mit Ihren Freunden.",
       "support": "Fehler melden oder Verbesserungen über GitHub vorschlagen.",
@@ -595,6 +598,7 @@
       "export": "Exportieren",
       "import": "Importieren",
       "languageFormat": "Sprache & Format",
+      "license": "Lizenz",
       "privacyPolicy": "Datenschutzrichtlinie",
       "share": "App teilen",
       "support": "Support",
@@ -651,6 +655,32 @@
       "noInvoicesText": "Einheiten ohne Rechnungen"
     },
     "noItem": "Einheit auswählen, um Details anzuzeigen."
+  },
+  "license": {
+    "statusSection": "Lizenzstatus",
+    "statusActive": "Aktiv",
+    "statusInactive": "Inaktiv",
+    "serialNumber": "Seriennummer",
+    "activatedAt": "Aktiviert am",
+    "requestKeyLabel": "Hardware-Anforderungsschlüssel",
+    "requestKeyHint": "Teilen Sie diesen Schlüssel dem Support mit, um Ihren Aktivierungscode zu erhalten.",
+    "activationTitle": "Lizenz aktivieren",
+    "activationCode": "Aktivierungscode",
+    "activateButton": "Aktivieren",
+    "error": {
+      "invalidSignature": "Ungültige Lizenzsignatur. Bitte überprüfen Sie Ihren Aktivierungscode.",
+      "alreadyActive": "Diese Lizenz ist bereits auf einem anderen Computer aktiv.",
+      "tampered": "Die Lizenzdaten wurden manipuliert.",
+      "unknown": "Ein unbekannter Fehler ist aufgetreten. Bitte wenden Sie sich an den Support."
+    },
+    "revokeSection": "Lizenz widerrufen",
+    "revokeWarning": "Das Widerrufen Ihrer Lizenz deaktiviert diesen Computer. Sie erhalten einen Stornierungsschlüssel, um die Lizenz auf ein anderes Gerät zu übertragen.",
+    "revokeButton": "Lizenz widerrufen",
+    "cancelKeyLabel": "Stornierungsschlüssel",
+    "cancelKeyHint": "Senden Sie diesen Stornierungsschlüssel an den Support, wenn Sie die Aktivierung auf einem neuen Gerät vornehmen.",
+    "cancelKeyPendingWarning": "Sie haben einen ausstehenden Stornierungsschlüssel von einem vorherigen Widerruf. Bitte senden Sie ihn an den Support, bevor Sie aktivieren.",
+    "revokeConfirmTitle": "Lizenz widerrufen?",
+    "revokeConfirmBody": "Dadurch wird die Lizenz auf diesem Computer deaktiviert. Ein Stornierungsschlüssel wird generiert, den Sie auf einem anderen Gerät verwenden können."
   },
   "employees": {
     "filter": {

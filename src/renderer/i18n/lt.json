@@ -137,6 +137,8 @@
     "buyerReferenceUBL": "Įveskite pirkėjo nuorodą arba skyriaus kodą (pvz., „Peppol“ maršrutizavimui)",
     "buyerReferenceXRechnung": "Įveskite privalomą Vokietijos institucijų suteiktą „Leitweg-ID“ (pvz., 991-01234-56)",
     "cancel": "Atšaukti",
+    "copy": "Kopijuoti",
+    "copied": "Nukopijuota!",
     "cash": "Grynieji",
     "category": "Kategorija",
     "checking": "Tikrinama...",
@@ -573,6 +575,7 @@
       "export": "Eksportuokite savo duomenis atsarginei kopijai arba naudoti kitose programose.",
       "import": "Importuokite savo duomenis iš kitų šaltinių arba atsarginių kopijų.",
       "languageFormat": "Kalba, sumos formatas, datos formatas.",
+      "license": "Tvarkykite savo aparatinės įrangos prie saisytą licenciją, peržiūrėkite aktyvacijos būseną arba atšaukite, kad perkeltumėte į kitą įrenginį.",
       "privacyPolicy": "Susipažinkite su mūsų privatumo politika apie tai, kaip tvarkome jūsų duomenis.",
       "share": "Bendrinkite šią programą su draugais.",
       "support": "Praneškite apie klaidas arba siūlykite patobulinimus per GitHub.",
@@ -595,6 +598,7 @@
       "export": "Eksportuoti",
       "import": "Importuoti",
       "languageFormat": "Kalba ir formatas",
+      "license": "Licencija",
       "privacyPolicy": "Privatumo politika",
       "share": "Bendrinti programą",
       "support": "Pagalba",
@@ -651,6 +655,32 @@
       "noInvoicesText": "Vienetai be sąskaitų"
     },
     "noItem": "Pasirinkite vienetą, kad pamatytumėte detales."
+  },
+  "license": {
+    "statusSection": "Licencijos būsena",
+    "statusActive": "Aktyvi",
+    "statusInactive": "Neaktyvi",
+    "serialNumber": "Serijos numeris",
+    "activatedAt": "Aktyvuota",
+    "requestKeyLabel": "Aparatinės įrangos užklausos raktas",
+    "requestKeyHint": "Pasidalykite šiuo raktu su palaikymu, kad gautumėte aktyvacijos kodą.",
+    "activationTitle": "Aktyvuoti licenciją",
+    "activationCode": "Aktyvacijos kodas",
+    "activateButton": "Aktyvuoti",
+    "error": {
+      "invalidSignature": "Neteisinga licencijos parašas. Patikrinkite aktyvacijos kodą.",
+      "alreadyActive": "Ši licencija jau aktyvi kitame kompiuteryje.",
+      "tampered": "Licencijos duomenys buvo pakeisti.",
+      "unknown": "Įvyko nežinoma klaida. Susisiekite su palaikymu."
+    },
+    "revokeSection": "Atšaukti licenciją",
+    "revokeWarning": "Atšaukus licenciją, šis kompiuteris bus išaktyvuotas. Gausite atšaukimo raktą licencijai perkelti į kitą įrenginį.",
+    "revokeButton": "Atšaukti licenciją",
+    "cancelKeyLabel": "Atšaukimo raktas",
+    "cancelKeyHint": "Išsiųskite šį atšaukimo raktą palaikymui aktyvuodami naujame įrenginyje.",
+    "cancelKeyPendingWarning": "Turite laukiantį atšaukimo raktą iš ankstesnio atšaukimo. Prieš aktyvuodami išsiųskite jį palaikymui.",
+    "revokeConfirmTitle": "Atšaukti licenciją?",
+    "revokeConfirmBody": "Tai išaktyvuos licenciją šiame kompiuteryje. Bus sugeneruotas atšaukimo raktas, kurį galėsite naudoti kitame įrenginyje."
   },
   "employees": {
     "filter": {

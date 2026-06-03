@@ -137,6 +137,8 @@
     "buyerReferenceUBL": "Saisissez la référence du client ou le code du service (ex: pour l'acheminement Peppol)",
     "buyerReferenceXRechnung": "Saisissez l'identifiant obligatoire Leitweg-ID fourni par l'administration allemande (ex: 991-01234-56)",
     "cancel": "Annuler",
+    "copy": "Copier",
+    "copied": "Copié !",
     "cash": "Espèces",
     "category": "Catégorie",
     "checking": "Vérification...",
@@ -573,6 +575,7 @@
       "export": "Exportez vos données pour sauvegarde ou utilisation ailleurs.",
       "import": "Importez vos données depuis d’autres sources ou fichiers de sauvegarde.",
       "languageFormat": "Langue, format des montants, format de date.",
+      "license": "Gérez votre licence liée au matériel, consultez le statut d'activation ou révoquez pour transférer sur un autre appareil.",
       "privacyPolicy": "Consultez notre politique de confidentialité.",
       "share": "Partagez cette application avec vos amis.",
       "support": "Signalez des bugs ou proposez des améliorations via GitHub.",
@@ -595,6 +598,7 @@
       "export": "Exporter",
       "import": "Importer",
       "languageFormat": "Langue & Format",
+      "license": "Licence",
       "privacyPolicy": "Politique de confidentialité",
       "share": "Partager l’application",
       "support": "Support",
@@ -651,6 +655,32 @@
       "noInvoicesText": "Unités n’ayant pas de factures"
     },
     "noItem": "Sélectionnez une unité pour afficher les détails."
+  },
+  "license": {
+    "statusSection": "Statut de la licence",
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "serialNumber": "Numéro de série",
+    "activatedAt": "Activée le",
+    "requestKeyLabel": "Clé de demande matérielle",
+    "requestKeyHint": "Partagez cette clé avec le support pour recevoir votre code d'activation.",
+    "activationTitle": "Activer la licence",
+    "activationCode": "Code d'activation",
+    "activateButton": "Activer",
+    "error": {
+      "invalidSignature": "Signature de licence invalide. Veuillez vérifier votre code d'activation.",
+      "alreadyActive": "Cette licence est déjà active sur un autre ordinateur.",
+      "tampered": "Les données de la licence ont été altérées.",
+      "unknown": "Une erreur inconnue s'est produite. Veuillez contacter le support."
+    },
+    "revokeSection": "Révoquer la licence",
+    "revokeWarning": "La révocation de votre licence désactivera cette machine. Vous recevrez une clé d'annulation pour transférer la licence sur un autre appareil.",
+    "revokeButton": "Révoquer la licence",
+    "cancelKeyLabel": "Clé d'annulation",
+    "cancelKeyHint": "Envoyez cette clé d'annulation au support lors de l'activation sur un nouvel appareil.",
+    "cancelKeyPendingWarning": "Vous avez une clé d'annulation en attente d'une révocation précédente. Veuillez l'envoyer au support avant d'activer.",
+    "revokeConfirmTitle": "Révoquer la licence ?",
+    "revokeConfirmBody": "Cela désactivera la licence sur cette machine. Une clé d'annulation sera générée pour une utilisation sur un autre appareil."
   },
   "employees": {
     "filter": {

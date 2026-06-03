@@ -14,7 +14,14 @@ source_files:
   - src/renderer/shared/types/license.ts
   - src/renderer/pages/activation/ActivationModal.tsx
   - src/renderer/pages/settings/content/LicenseSettings.tsx
+  - src/renderer/pages/settings/menu/Menu.tsx
+  - src/renderer/app/App.tsx
   - src/renderer/shared/enums/menuItemSettings.ts
+  - src/renderer/i18n/en.json
+  - src/renderer/i18n/th.json
+  - src/renderer/i18n/de.json
+  - src/renderer/i18n/fr.json
+  - src/renderer/i18n/lt.json
   - support-tools/generate-keys.js
   - support-tools/generate-activation.js
   - support-tools/verify-cancel.js
@@ -25,7 +32,7 @@ models: []
 test_files:
   - src/tests/unit/license.test.ts
 data_flow: greenfield
-last_synced: 2026-06-03
+last_synced: 2026-06-04
 status: complete
 phase: all
 mdd_version: 11
@@ -69,14 +76,18 @@ sister_projects: []
   If valid: licenseStore.ts stores {activationCode, serialNumber, activatedAt}
 
 [Renderer — Revocation (Settings/License)]
-  User clicks "ถอนสิทธิ์"
+  User clicks "ยกเลิกใบอนุญาต" → confirm dialog → confirm
   → IPC: 'revoke-license'
   Main process:
     cancelKey = HMAC-SHA256(requestKey, CANCEL_SECRET_EMBEDDED)
-    rotate salt (new random 32-byte salt → new requestKey for next activation)
+    writeCancelKey(cancelKey) → เก็บลง secure storage
     clear stored activationCode from secure storage
-  → return cancelKey to renderer
-  Renderer shows cancelKey → user sends to Support
+    rotate salt (new random 32-byte salt → new requestKey for next activation)
+  → return { cancelKey, requestKey } to renderer
+  Renderer: window.location.reload()
+    → App restarts → getLicenseState() → { status: 'unlicensed', cancelKey }
+    → ActivationModal โผล่พร้อมแสดง cancelKey + warning
+  User copies cancelKey → ส่งให้ Support
 
 [Support Tool]
   verify-cancel.js:
@@ -99,6 +110,7 @@ sister_projects: []
 |-----|------|-------------|
 | `InvoiceBuilder/license-salt` | hex string (32 bytes) | random salt สำหรับ requestKey |
 | `InvoiceBuilder/license-activation` | JSON string | `{activationCode, serialNumber, activatedAt}` |
+| `InvoiceBuilder/license-cancel-key` | hex string | cancelKey จาก revoke ล่าสุด — เก็บไว้จนกว่า activate สำเร็จ |
 
 ### licenses.txt (Support POC — เก็บฝั่ง Support เท่านั้น)
 ```
@@ -110,7 +122,7 @@ SN-002 | <requestKey> | canceled | 2026-06-01 | 2026-06-02
 ## API Endpoints (IPC Channels)
 
 ### `get-license-state` → `LicenseState`
-ดึงสถานะ License ปัจจุบัน พร้อม requestKey สำหรับแสดงในหน้า Activation
+ดึงสถานะ License ปัจจุบัน พร้อม requestKey สำหรับแสดงในหน้า Activation รวมถึง cancelKey (ถ้ามีจาก revoke ก่อนหน้า)
 
 **Response:**
 ```typescript
@@ -119,6 +131,7 @@ type LicenseState = {
   requestKey: string;          // base32-encoded hash (20 chars, เพื่อ user-friendly)
   serialNumber?: string;
   activatedAt?: string;        // ISO date
+  cancelKey?: string;          // มีเฉพาะกรณีที่เคย revoke แต่ยังไม่ activate ใหม่
 }
 ```
 
@@ -135,7 +148,7 @@ type ActivationResult = {
 ```
 
 ### `revoke-license` → `RevokeResult`
-ถอนสิทธิ์ — คำนวณ cancelKey, หมุน salt ใหม่, ล้าง activation จาก secure storage
+ถอนสิทธิ์ — คำนวณ cancelKey, **บันทึก cancelKey ลง secure storage ก่อน**, หมุน salt ใหม่, ล้าง activation จาก secure storage
 
 **Response:**
 ```typescript
@@ -145,6 +158,8 @@ type RevokeResult = {
 }
 ```
 
+> cancelKey ที่บันทึกใน storage จะถูก clear อัตโนมัติเมื่อ `activate-license` สำเร็จ
+
 ## Business Rules
 
 1. **First launch gate**: ถ้า `get-license-state` คืน `status: 'unlicensed'` → renderer แสดง `ActivationModal` บังหน้าจอ ก่อนโหลด content
@@ -152,11 +167,66 @@ type RevokeResult = {
 3. **activationCode = Ed25519 signature** over `requestKey` (UTF-8) — 64 bytes → Base32 uppercase (A-Z, 2-7) → 104 chars → จัดกลุ่ม 8 ตัวคั่น `-` เป็น 13 กลุ่ม
 4. **Verification**: decode Base32 → 64 bytes → `ed25519.verify(bytes, Buffer.from(requestKey, 'utf8'), PUBLIC_KEY_BYTES)`
 5. **Salt rotation on revoke**: generate 32 new random bytes, save to secure storage, invalidates all previous activationCodes
-6. **cancelKey**: `HMAC-SHA256(requestKey, CANCEL_SECRET)` → hex — `CANCEL_SECRET` hardcoded ใน app (obfuscated) และใน support tool
-7. **Serial Number บน machines**: POC — 1 serial = 1 machine ต่อครั้ง; รองรับ future `maxMachines` field ใน payload โดย Support sign `{requestKey, serialNumber, maxMachines?, expiresAt?}` แทน `requestKey` เดิม (design extension, ยังไม่ implement ใน phase นี้)
-8. **Platform storage**:
-   - macOS: ใช้ `keytar` (Electron's keytar) เก็บใน Keychain under service `invoice-builder`
-   - Windows: ใช้ `winreg` เก็บใน `HKCU\Software\InvoiceBuilder`
+6. **cancelKey persistence**: cancelKey บันทึกลง secure storage ทันทีเมื่อ revoke สำเร็จ — ถ้า user ปิด app ก่อนส่ง cancelKey ให้ Support จะยังเห็น cancelKey ใน ActivationModal ครั้งถัดไปที่เปิด app
+7. **cancelKey cleared on activation**: เมื่อ `activate-license` สำเร็จ → `clearCancelKey()` ถูก call ทันที
+8. **cancelKey**: `HMAC-SHA256(requestKey, CANCEL_SECRET)` → hex — `CANCEL_SECRET` hardcoded ใน app (obfuscated) และใน support tool
+9. **Revoke flow → window reload**: หลัง revoke สำเร็จ → `window.location.reload()` → app restart → `dbReady = false` → DatabaseChooser โผล่ → ActivationModal แสดงทับพร้อม cancelKey
+10. **Serial Number บน machines**: POC — 1 serial = 1 machine ต่อครั้ง; รองรับ future `maxMachines` field ใน payload โดย Support sign `{requestKey, serialNumber, maxMachines?, expiresAt?}` แทน `requestKey` เดิม (design extension, ยังไม่ implement ใน phase นี้)
+11. **Platform storage**:
+    - macOS/Linux: ใช้ `keytar` เก็บใน Keychain/Secret Service under service `invoice-builder`
+    - Windows: ใช้ `winreg` เก็บใน `HKCU\Software\InvoiceBuilder`
+    - Fallback: ถ้า keytar/winreg ล้มเหลว → เก็บใน `<userData>/.license-store.json`
+
+## UI Components
+
+### ActivationModal (`src/renderer/pages/activation/ActivationModal.tsx`)
+- แสดงเมื่อ `licenseState.status === 'unlicensed'` ใน `App.tsx`
+- Props: `requestKey`, `cancelKey?`, `onActivated`
+- ถ้ามี `cancelKey` → แสดง Alert warning + cancel key box พร้อมปุ่ม copy ก่อน fields activation
+- ใช้ `bgcolor: 'action.hover'` (theme-aware) แทน `grey.100` เพื่อ dark mode compatibility
+- `disableEscapeKeyDown` — ปิดไม่ได้จนกว่าจะ activate
+
+### LicenseSettings (`src/renderer/pages/settings/content/LicenseSettings.tsx`)
+- แสดงใน Settings page เมื่อเลือก `MenuItemSettings.License`
+- แสดง: status chip, serial number, activated at, request key, revoke section
+- Revoke flow: Confirm Dialog → `revokeLicense()` → `window.location.reload()`
+- ไม่มี `onRevoked` prop อีกต่อไป — ใช้ reload แทน
+
+### App.tsx
+- Fetch `licenseState` ครั้งเดียวตอน mount
+- ถ้า `status === 'unlicensed'` → render `ActivationModal` ทับทุกอย่าง (รวม DatabaseChooser)
+- หลัง activate → `getLicenseState()` ใหม่ → modal หาย → flow ปกติ
+
+## i18n Keys
+
+ทุก text ใน License feature ใช้ `useTranslation()` — ไม่มี hardcoded string ในหน้า renderer
+
+### Namespaces ที่เพิ่ม (ทุก locale: en, th, de, fr, lt)
+
+| Key | Usage |
+|-----|-------|
+| `license.statusSection` | หัวข้อ "สถานะใบอนุญาต" ใน LicenseSettings |
+| `license.statusActive` / `license.statusInactive` | Chip แสดงสถานะ |
+| `license.serialNumber` / `license.activatedAt` | ข้อมูล activation |
+| `license.requestKeyLabel` | หัวข้อ Hardware Request Key |
+| `license.requestKeyHint` | คำอธิบายใต้ request key box ใน ActivationModal |
+| `license.activationTitle` | ชื่อ Dialog activation |
+| `license.activationCode` | Label ช่อง activation code |
+| `license.activateButton` | ปุ่ม activate |
+| `license.revokeSection` | หัวข้อ revoke section |
+| `license.revokeWarning` | Alert warning ก่อน revoke |
+| `license.revokeButton` | ปุ่ม revoke |
+| `license.revokeConfirmTitle` / `license.revokeConfirmBody` | Confirm dialog |
+| `license.cancelKeyLabel` | หัวข้อ cancel key |
+| `license.cancelKeyHint` | คำอธิบายใต้ cancel key box |
+| `license.cancelKeyPendingWarning` | Alert warning ใน ActivationModal เมื่อมี pending cancelKey |
+| `license.error.invalidSignature` | Error: signature ไม่ตรง |
+| `license.error.alreadyActive` | Error: ใช้งานบนเครื่องอื่นอยู่ |
+| `license.error.tampered` | Error: ข้อมูลถูกแก้ไข |
+| `license.error.unknown` | Error: ไม่รู้จัก |
+| `common.copy` / `common.copied` | ปุ่ม copy / หลัง copy สำเร็จ |
+| `settingsMenuItems.titles.license` | ชื่อ menu item ใน Settings sidebar |
+| `settingsMenuItems.descriptions.license` | คำอธิบาย menu item |
 
 ## Data Flow
 

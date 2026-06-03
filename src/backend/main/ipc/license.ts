@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import { getHardwareId } from '../license/hardwareId';
-import { readOrCreateSalt, rotateSalt, writeLicenseActivation, clearLicenseActivation, readLicenseState } from '../license/licenseStore';
+import { readOrCreateSalt, rotateSalt, writeLicenseActivation, clearLicenseActivation, readLicenseState, writeCancelKey, clearCancelKey } from '../license/licenseStore';
 import { deriveRequestKey, verifyActivationCode, computeCancelKey } from '../license/licenseVerify';
 
 export const initLicenseHandlers = () => {
@@ -24,6 +24,7 @@ export const initLicenseHandlers = () => {
       serialNumber,
       activatedAt: new Date().toISOString().split('T')[0]
     });
+    await clearCancelKey();
     return { success: true };
   });
 
@@ -33,6 +34,7 @@ export const initLicenseHandlers = () => {
     const requestKey = deriveRequestKey(hardwareId, salt);
 
     const cancelKey = computeCancelKey(requestKey);
+    await writeCancelKey(cancelKey);
     await clearLicenseActivation();
     const newSalt = await rotateSalt();
     const newRequestKey = deriveRequestKey(hardwareId, newSalt);

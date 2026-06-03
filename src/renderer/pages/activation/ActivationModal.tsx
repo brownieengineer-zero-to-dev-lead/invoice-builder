@@ -1,29 +1,36 @@
 import React, { useState } from 'react';
 import {
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  TextField, Button, Box, Typography, Alert, IconButton,
-  CircularProgress, Tooltip,
+  Alert, Box, Button, CircularProgress, Dialog, DialogActions,
+  DialogContent, DialogTitle, IconButton, TextField, Tooltip, Typography,
 } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
   requestKey: string;
+  cancelKey?: string;
   onActivated: () => void;
 }
 
-export const ActivationModal: React.FC<Props> = ({ requestKey, onActivated }) => {
+export const ActivationModal: React.FC<Props> = ({ requestKey, cancelKey, onActivated }) => {
   const { t } = useTranslation();
   const [serial, setSerial] = useState('');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [cancelCopied, setCancelCopied] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(requestKey);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCancelCopy = () => {
+    if (cancelKey) navigator.clipboard.writeText(cancelKey);
+    setCancelCopied(true);
+    setTimeout(() => setCancelCopied(false), 2000);
   };
 
   const handleActivate = async () => {
@@ -56,7 +63,7 @@ export const ActivationModal: React.FC<Props> = ({ requestKey, onActivated }) =>
           <Typography variant="subtitle2" gutterBottom>
             {t('license.requestKeyLabel')}
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'grey.100', px: 2, py: 1, borderRadius: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'action.hover', px: 2, py: 1, borderRadius: 1 }}>
             <Typography fontFamily="monospace" sx={{ flexGrow: 1, wordBreak: 'break-all' }}>
               {requestKey}
             </Typography>
@@ -70,6 +77,24 @@ export const ActivationModal: React.FC<Props> = ({ requestKey, onActivated }) =>
             {t('license.requestKeyHint')}
           </Typography>
         </Box>
+
+        {cancelKey && (
+          <Box sx={{ mb: 3 }}>
+            <Alert severity="warning" sx={{ mb: 1 }}>{t('license.cancelKeyPendingWarning')}</Alert>
+            <Typography variant="subtitle2" gutterBottom>{t('license.cancelKeyLabel')}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'action.hover', px: 2, py: 1, borderRadius: 1 }}>
+              <Typography fontFamily="monospace" sx={{ flexGrow: 1, wordBreak: 'break-all' }}>
+                {cancelKey}
+              </Typography>
+              <Tooltip title={cancelCopied ? t('common.copied') : t('common.copy')}>
+                <IconButton size="small" onClick={handleCancelCopy}>
+                  <ContentCopyIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+            <Typography variant="caption" color="text.secondary">{t('license.cancelKeyHint')}</Typography>
+          </Box>
+        )}
 
         <TextField
           fullWidth

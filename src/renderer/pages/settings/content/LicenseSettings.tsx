@@ -5,11 +5,9 @@ import {
 } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useTranslation } from 'react-i18next';
-import type { LicenseState, RevokeResult } from '../../../shared/types/license';
+import type { LicenseState } from '../../../shared/types/license';
 
-interface Props {
-  onRevoked: () => void;
-}
+interface Props {}
 
 const CopyBox: React.FC<{ value: string }> = ({ value }) => {
   const { t } = useTranslation();
@@ -20,7 +18,7 @@ const CopyBox: React.FC<{ value: string }> = ({ value }) => {
     setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'grey.100', px: 2, py: 1, borderRadius: 1 }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'action.hover', px: 2, py: 1, borderRadius: 1 }}>
       <Typography fontFamily="monospace" sx={{ flexGrow: 1, wordBreak: 'break-all' }}>{value}</Typography>
       <Tooltip title={copied ? t('common.copied') : t('common.copy')}>
         <IconButton size="small" onClick={handleCopy}><ContentCopyIcon fontSize="small" /></IconButton>
@@ -29,12 +27,11 @@ const CopyBox: React.FC<{ value: string }> = ({ value }) => {
   );
 };
 
-export const LicenseSettings: React.FC<Props> = ({ onRevoked }) => {
+export const LicenseSettings: React.FC<Props> = () => {
   const { t } = useTranslation();
   const [state, setState] = useState<LicenseState | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [revoking, setRevoking] = useState(false);
-  const [revokeResult, setRevokeResult] = useState<RevokeResult | null>(null);
 
   useEffect(() => {
     window.electronAPI.getLicenseState().then(setState);
@@ -43,10 +40,8 @@ export const LicenseSettings: React.FC<Props> = ({ onRevoked }) => {
   const handleRevoke = async () => {
     setRevoking(true);
     try {
-      const result = await window.electronAPI.revokeLicense();
-      setRevokeResult(result);
-      setConfirmOpen(false);
-      onRevoked();
+      await window.electronAPI.revokeLicense();
+      window.location.reload();
     } finally {
       setRevoking(false);
     }
@@ -85,14 +80,6 @@ export const LicenseSettings: React.FC<Props> = ({ onRevoked }) => {
           <Typography variant="subtitle1" fontWeight="bold" gutterBottom>{t('license.revokeSection')}</Typography>
           <Alert severity="warning" sx={{ mb: 2 }}>{t('license.revokeWarning')}</Alert>
           <Button variant="outlined" color="error" onClick={() => setConfirmOpen(true)}>{t('license.revokeButton')}</Button>
-        </Box>
-      )}
-
-      {revokeResult && (
-        <Box>
-          <Typography variant="subtitle2" gutterBottom>{t('license.cancelKeyLabel')}</Typography>
-          <CopyBox value={revokeResult.cancelKey} />
-          <Typography variant="caption" color="text.secondary">{t('license.cancelKeyHint')}</Typography>
         </Box>
       )}
 
